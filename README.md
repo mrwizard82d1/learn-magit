@@ -1,10 +1,17 @@
 # test-utils-cljs
 
-FIXME: Write a one-line description of your library/project.
+A set of utilities to support test-driven development.
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+When creating unit tests, developers need data that is **not** critical to the test. As Brian Marick says, if we need data that is not critical, arbitrary data is most likely to uncover an error in our code. These utilities support generating this arbitrary data.
+
+For now, I think that the core module will contain the most basic code: Generating
+
+* Random integers
+* Floating-point numbers
+* Characters 
+* Dates
 
 ## Setup
 
@@ -25,9 +32,9 @@ installable via brew):
 To get source map support in the Node REPL:
 
     lein npm install
-    
+
 To start a browser REPL:
-    
+
 1. Uncomment the following lines in src/test_utils_cljs/core.cljs:
 ```clojure
 ;; (defonce conn
@@ -37,14 +44,14 @@ To start a browser REPL:
 3. Browse to `http://localhost:9000` (you should see `Hello world!` in the web console)
 4. (back to step 3) you should now see the REPL prompt: `cljs.user=>`
 5. You may now evaluate ClojureScript statements in the browser context.
-    
+
 For more info using the browser as a REPL environment, see
 [this](https://github.com/clojure/clojurescript/wiki/The-REPL-and-Evaluation-Environments#browser-as-evaluation-environment).
-    
+
 Clean project specific out:
 
     lein clean
-     
+
 Build a single release artifact with the following script and then open `index_release.html` in your browser.
 
     ./scripts/release
