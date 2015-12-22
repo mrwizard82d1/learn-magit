@@ -13,3 +13,6 @@ pom.xml.asc
 
 # Ignore ClojureScript output file
 /out/
+
+# Ignore (local) node_modules
+node_modules/
