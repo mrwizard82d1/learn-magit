@@ -39,3 +39,4 @@
 (defn rand-words
   ([] (rand-words (read-latin-words "latin-words.md") rand-nth))
   ([words rand-f] (rand-f words)))
+

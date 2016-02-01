@@ -14,6 +14,9 @@ pom.xml.asc
 # Ignore ClojureScript output file
 /out/
 
+# Ignore (local) node_modules
+node_modules/
+
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
 *.iml
