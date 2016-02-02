@@ -36,7 +36,7 @@
 
 (def read-latin-words (memoize read-latin-words-from))
 
-(defn rand-words
-  ([] (rand-words (read-latin-words "latin-words.md") rand-nth))
+(defn rand-word
+  ([] (rand-word (read-latin-words "latin-words.md") rand-nth))
   ([words rand-f] (rand-f words)))
 
