@@ -27,4 +27,10 @@
 (defn rand-alphas
   "Return a string a n random, alphabetic characters."
     ([] (repeatedly rand-alpha))
-    ([n] (apply str (take n (rand-alphas)))))
+    ([n] (apply str (take n (rand-alphas)))))i
+
+(defn rand-timestamp
+	[begin-year end-year]
+	"Return a vector with random timestamp elements with years in the range [begin-year, end-year)."
+	[(rand-range begin-year end-year) (rand-range 1 13) (rand-int 31) (rand-int 24) (rand-int 60) (rand-int 60)])
+
