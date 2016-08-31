@@ -27,7 +27,7 @@
 (defn rand-alphas
   "Return a string a n random, alphabetic characters."
     ([] (repeatedly rand-alpha))
-    ([n] (apply str (take n (rand-alphas)))))i
+    ([n] (apply str (take n (rand-alphas)))))
 
 (defn rand-timestamp
 	[begin-year end-year]
