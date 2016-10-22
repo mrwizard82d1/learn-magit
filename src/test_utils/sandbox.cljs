@@ -21,3 +21,9 @@
 
 (defn phone-number []
   (str "555-" (tuc/rand-3) "-" (tuc/rand-4)))
+
+(defn date []
+  (str (tuc/rand-range 1999 2023) "-"
+       (tuc/rand-range 1 13) "-"
+       (tuc/rand-range 1 32) " "))
+
