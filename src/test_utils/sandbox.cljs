@@ -10,20 +10,26 @@
 (defn person-name []
   [(ws/rand-word) (if (= 0 (rem (rand-int 300) 3)) (tuc/rand-alpha) "") (ws/rand-word)])
 
-(defn house-number []
-  (tuc/rand-4))
-
-(defn street-name []
-  (repeatedly 2 ws/rand-word))
-
-(defn zip-code []
-  (tuc/rand-5))
-
-(defn phone-number []
-  (str "555-" (tuc/rand-3) "-" (tuc/rand-4)))
+(defn two-digit-zero-pad [number]
+  (if (>= number 10)
+    number
+    (str "0" number)))
 
 (defn date []
   (str (tuc/rand-range 1999 2023) "-"
-       (tuc/rand-range 1 13) "-"
-       (tuc/rand-range 1 32) " "))
+       (two-digit-zero-pad (tuc/rand-range 1 13)) "-"
+       (two-digit-zero-pad (tuc/rand-range 1 32))))
 
+(defn wallclock []
+  (str (two-digit-zero-pad (tuc/rand-range 0 25)) ":"
+       (two-digit-zero-pad (tuc/rand-range 0 60)) ":"
+       (two-digit-zero-pad (tuc/rand-range 0 60))))
+
+(defn date-time []
+  (str (date) "T" (wallclock)))
+
+(defn price [] 
+  [(tuc/rand-2) (tuc/rand-2)])
+
+(defn tax [] 
+  [(tuc/rand-digit) (tuc/rand-2)])

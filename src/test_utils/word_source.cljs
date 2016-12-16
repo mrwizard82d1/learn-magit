@@ -40,3 +40,13 @@
   ([] (rand-word (read-latin-words "latin-words.md") rand-nth))
   ([words rand-f] (rand-f words)))
 
+
+(defn noun [declension]
+  (println (case declension
+             1 (clj-str/join "\n" ["Maria, queen of reggae, gave Fannie Mae some jam for her bananā.",
+                                   "Fannie Mae, fond of ā rum, gave the Israelīs some bananās from the delīs."])
+             2 (clj-str/join "\n" ["Gus and Peter, friends of Luigī, gave Mariō some gum for his burritō.", 
+                                   "He and Ī, kings of the quōrum, gave the Israelīs some burritōs from the delīs."])    
+             3 (clj-str/join "\n" ["The Black Hole Gang*, friends of Beavis, gave Bambī a gem from Chile.",
+                                   "The Apachēs, masters of the drum, gave the minibus some tamalēs from the omnibus."]))))
+
