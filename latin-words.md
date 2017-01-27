@@ -624,7 +624,7 @@ lupa, lupae f  N
 viscus, visci m  N
 :   mistletoe; bird-lime
 
-vulnus, vuleris n  N
+vulnus, vulneris n  N
 :   wound; mental / emotional hurt
 
 incredulitas, incredulitatis f  N

@@ -1,6 +1,8 @@
 (ns test-utils.address
   (:require [test-utils.core :as tuc]
-            [test-utils.word-source :as ws]))
+            [test-utils.word-source :as ws]
+            [goog.string :as gstring]
+            [goog.string.format]))
 
 (defn house-number []
   (tuc/rand-4))
@@ -12,7 +14,7 @@
   (tuc/rand-5))
 
 (defn phone-number []
-  (str "555-" (tuc/rand-3) "-" (tuc/rand-4)))
+  (str "1" (gstring/format "%02d" (tuc/rand-2))  "-" "555" "-01" (gstring/format "%02d" (tuc/rand-2))))
 
 (defn state []
   (let [abbreviations ["AL" "AK" "AZ" "AR" 
