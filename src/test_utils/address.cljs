@@ -33,3 +33,10 @@
                        "VT" "VA"
                        "WA" "WV" "WI" "WY"]]
     (rand-nth abbreviations)))
+
+(defn email []
+  (let [top-domains [".com" ".org" ".net" ".int" ".edu" ".gov" ".mil" ".au" ".dk" ".ec" ".kg" ".sh" ".uk"]
+        top-domain (nth top-domains (rand-int (count top-domains)))
+        local-part (ws/rand-word)
+        domain-part (ws/rand-word)]
+    [local-part "@" domain-part top-domain]))
