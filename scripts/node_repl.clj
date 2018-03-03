@@ -7,7 +7,7 @@
                       {:main 'test-utils.core
                        :output-to "out/test-utils.js"
                        :output-dir "out"
-                       :target :nodesj
+                       :target :nodejs
                        :verbose true})
 
 ;; Invoke the node.js REPL.
