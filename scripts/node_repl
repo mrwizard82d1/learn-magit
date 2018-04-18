@@ -6,9 +6,9 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     rlwrap lein trampoline run -m clojure.main scripts/node_repl.clj
 elif [ "$(expr substr $(uname -s) 1 9)" == "CYGWIN_NT" ]; then
     rlwrap ~/.lein/bin/lein.bat run -m clojure.main scripts/node_repl.clj
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]; then
     # Do something under Windows NT platform
     # I need to install rlwrap on Windows - but not for now.
 
-    cmd //c /c/cygwin64/home/ljones/.lein/bin/lein.bat trampoline run -m clojure.main scripts/node_repl.clj
+    cmd //c /c/Users/larry.jones/.lein/bin/lein.bat trampoline run -m clojure.main scripts/node_repl.clj
 fi
