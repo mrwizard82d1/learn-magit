@@ -39,6 +39,10 @@
   ([] (rand-word (read-latin-words "latin-words.md") rand-nth))
   ([words rand-f] (rand-f words)))
 
+(defn rand-words
+  "Return a sequence of `n` (defaults to 3) random words."
+  ([] (rand-words 3))
+  ([n] (repeatedly n rand-word)))
 
 (defn noun [declension]
   (println (case declension
