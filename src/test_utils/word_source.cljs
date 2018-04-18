@@ -1,6 +1,5 @@
 (ns test-utils.word-source
-   (:require [cljs.nodejs :as nodejs]
-             [clojure.string :as clj-str]))
+   (:require [clojure.string :as clj-str]))
 
 (def fs (js/require "fs"))
 
