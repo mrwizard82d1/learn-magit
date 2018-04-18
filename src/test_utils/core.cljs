@@ -20,8 +20,10 @@
 
 (defn rand-alpha []
   "Return a random, alphabetic character."
-  (let [alpha-chars (map char(concat (range (.charCodeAt "A") (.charCodeAt "Z"))
-                               (range (.charCodeAt "a") (.charCodeAt "z"))))]
+  (let [alpha-chars (map char(concat (range (.charCodeAt "A")
+                                            (.charCodeAt "Z"))
+                               (range (.charCodeAt "a")
+                                      (.charCodeAt "z"))))]
     (nth alpha-chars (rand-range 0 (count alpha-chars)))))
 
 (defn rand-alphas
@@ -30,6 +32,8 @@
     ([n] (apply str (take n (rand-alphas)))))
 
 (defn rand-timestamp [begin-year end-year]
-  "Return a vector with random timestamp elements with years in the range [begin-year, end-year)."
-  [(rand-range begin-year end-year) (rand-range 1 13) (rand-int 31) (rand-int 24) (rand-int 60) (rand-int 60)])
+  "Return a vector with random timestamp elements with years in the range
+  [begin-year, end-year)."
+  [(rand-range begin-year end-year) (rand-range 1 13) (rand-int 31)
+   (rand-int 24) (rand-int 60) (rand-int 60)])
 
