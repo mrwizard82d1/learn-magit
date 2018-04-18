@@ -1,4 +1,5 @@
-(ns test-utils.core)
+(ns test-utils.core
+  (:require [kixi.stats.distribution :as ksd]))
 
 (enable-console-print!)
 
@@ -36,4 +37,18 @@
   [begin-year, end-year)."
   [(rand-range begin-year end-year) (rand-range 1 13) (rand-int 31)
    (rand-int 24) (rand-int 60) (rand-int 60)])
+
+(defn draw-normal
+  "Draw a single value from the normal distribution with mean, `mu`
+  (default 0.0), and standard deviation, `sigma` (default 1.0)."
+  ([] (draw-normal 0.0 1.0))
+  ([mu sigma] (ksd/draw (ksd/normal {:mu mu :sd sigma}))))
+
+(defn sample-normal
+  "Return a sample of n (default 3) values from the normal distribution
+  with mean, `mu` (default 0.0), and standard deviation, `sigma`
+  (default 1.0)."
+  ([] (sample-normal 3 0.0 1.0))
+  ([n] (sample-normal n 0.0 1.0))
+  ([n mu sigma] (ksd/sample n (ksd/normal {:mu mu :sd sigma}))))
 
