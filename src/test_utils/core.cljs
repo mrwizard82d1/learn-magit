@@ -15,9 +15,10 @@
 (def rand-9 (partial rand-int 1e9))
 (def rand-10 (partial rand-int 1e10))
 
-(defn rand-range [begin end]
+(defn rand-range
   "Return a random integer between begin and end (excluding end)."
-  (+ begin (rand-int (- end begin))))
+  ([end] (rand-range 0 end))
+  ([begin end] (+ begin (rand-int (- end begin)))))
 
 (defn rand-alpha []
   "Return a random, alphabetic character."

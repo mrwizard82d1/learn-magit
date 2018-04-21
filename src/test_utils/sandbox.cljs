@@ -36,3 +36,12 @@
 
 (defn typical-drilling-depth []
   (tuc/draw-normal 8000 1216))
+
+(defn rand-easting []
+  (let [minimum-easting 167000
+        maximum-easting 833000]
+    (tuc/rand-range minimum-easting (inc maximum-easting))))
+
+(defn rand-northing []
+  (let [maximum-northing 1e7]
+    (tuc/rand-range maximum-northing)))
