@@ -33,3 +33,6 @@
 
 (defn tax [] 
   [(tuc/rand-digit) (tuc/rand-2)])
+
+(defn typical-drilling-depth []
+  (tuc/draw-normal 8000 1216))
