@@ -1,5 +1,5 @@
 (ns test-utils.sandbox
-  (:require [test-utils.core :as tuc] 
+  (:require [test-utils.core :as tuc]
             [test-utils.word-source :as ws]))
 
 ;; Stuff I'm trying out
@@ -28,14 +28,31 @@
 (defn date-time []
   (str (date) "T" (wallclock)))
 
-(defn price [] 
+(defn price []
   [(tuc/rand-2) (tuc/rand-2)])
 
-(defn tax [] 
+(defn tax []
   [(tuc/rand-digit) (tuc/rand-2)])
 
-(defn typical-drilling-depth []
+(defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
+
+(defn typical-toe-measured-depth []
+  (tuc/draw-normal 18000 1500))
+
+(defn typical-stage-top []
+  (tuc/draw-normal 13750 2150))
+
+(defn typical-stage-length []
+  (tuc/draw-normal 152 17))
+
+(defn typical-stage-extent
+  ([]
+   (typical-stage-extent typical-stage-top))
+  ([top-f]
+   (let [top (top-f)
+         length (typical-stage-length)]
+     (vector top (+ top length)))))
 
 (defn rand-easting []
   (let [minimum-easting 167000
