@@ -62,3 +62,46 @@
 (defn rand-northing []
   (let [maximum-northing 1e7]
     (tuc/rand-range maximum-northing)))
+
+(defn rand-minimal-xy-monitor-treatment-distance []
+  (let [minimum-euclidean-distance 946.9745
+        x-component (* minimum-euclidean-distance (rand))
+        y-component (Math/sqrt (- (* minimum-euclidean-distance minimum-euclidean-distance) (* x-component x-component)))]
+    [x-component y-component]))
+
+(defn rand-well-number []
+  (inc (tuc/rand-digit)))
+
+(defn rand-stage-number []
+  (inc (tuc/rand-2)))
+
+(defn flat-trajectory [md x y z stage-length plot-angle]
+  (let [next-fn (fn [[md0 x0 y0 z0]]
+                  (let [step (tuc/draw-normal stage-length (/ stage-length 10))
+                        step-angle (tuc/draw-normal plot-angle (/ plot-angle 10))]
+                    [(+ md0 (tuc/draw-normal stage-length (/ stage-length 10)))
+                     (+ x0 (* step (Math/cos (* (/ step-angle 180) Math.PI))))
+                     (+ y0 (* step (Math/sin (* (/ step-angle 180) Math.PI))))
+                     (tuc/draw-normal z (/ z 10))
+                     ]))]
+    (iterate next-fn [md x y z])))
+
+(defn typical-treatment-times []
+  (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
+        duration-hours (tuc/draw-normal 2.5 0.25)
+        duration-hour (int duration-hours)
+        duration-minute (int (* 60 (- duration-hours duration-hour)))
+        duration-seconds (rand-nth (range 60))]
+    [start
+     [year-0 month-0 day-0 
+      (rem (+ hour-0 duration-hour) 24)
+      (rem (+ minute-0 duration-minute) 60)
+      duration-seconds]]))
+
+(defn stage-extents []
+  (let [extent-0 (typical-stage-extent)
+        next-fn (fn [[top-0 bottom-0] extent-0]
+                  [(+ top-0 (typical-stage-length))
+                   (+ bottom-0 (typical-stage-length))])]
+    (iterate next-fn extent-0)))
+
