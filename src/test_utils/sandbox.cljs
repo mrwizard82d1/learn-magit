@@ -75,15 +75,17 @@
 (defn rand-stage-number []
   (inc (tuc/rand-2)))
 
-(defn flat-trajectory [md x y z stage-length plot-angle]
+(defn typical-trajectory-md-length []
+  (tuc/draw-normal 93.7 0.4))
+
+(defn flat-trajectory [md x y z plot-angle]
   (let [next-fn (fn [[md0 x0 y0 z0]]
-                  (let [step (tuc/draw-normal stage-length (/ stage-length 10))
+                  (let [step (typical-trajectory-md-length)
                         step-angle (tuc/draw-normal plot-angle (/ plot-angle 10))]
-                    [(+ md0 (tuc/draw-normal stage-length (/ stage-length 10)))
+                    [(+ md0 step)
                      (+ x0 (* step (Math/cos (* (/ step-angle 180) Math.PI))))
                      (+ y0 (* step (Math/sin (* (/ step-angle 180) Math.PI))))
-                     (tuc/draw-normal z (/ z 10))
-                     ]))]
+                     (tuc/draw-normal z (/ z 10))]))]
     (iterate next-fn [md x y z])))
 
 (defn typical-treatment-times []
@@ -98,10 +100,15 @@
       (rem (+ minute-0 duration-minute) 60)
       duration-seconds]]))
 
+
+(defn typical-stage-separation []
+  (tuc/draw-normal 45 3))
+
 (defn stage-extents []
   (let [extent-0 (typical-stage-extent)
-        next-fn (fn [[top-0 bottom-0] extent-0]
-                  [(+ top-0 (typical-stage-length))
-                   (+ bottom-0 (typical-stage-length))])]
+        next-fn (fn [[top-n-1 bottom-n-1] extent-0]
+                   (let [bottom (- top-n-1 (typical-stage-separation))
+                         top (- bottom (typical-stage-length))]
+                     [top bottom]))]
     (iterate next-fn extent-0)))
 
