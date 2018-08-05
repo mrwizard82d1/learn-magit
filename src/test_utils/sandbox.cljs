@@ -81,11 +81,11 @@
 (defn flat-trajectory [md x y z plot-angle]
   (let [next-fn (fn [[md0 x0 y0 z0]]
                   (let [step (typical-trajectory-md-length)
-                        step-angle (tuc/draw-normal plot-angle (/ plot-angle 10))]
+                        step-angle (tuc/draw-normal plot-angle 14)]
                     [(+ md0 step)
                      (+ x0 (* step (Math/cos (* (/ step-angle 180) Math.PI))))
                      (+ y0 (* step (Math/sin (* (/ step-angle 180) Math.PI))))
-                     (tuc/draw-normal z (/ z 10))]))]
+                     (tuc/draw-normal z 4)]))]
     (iterate next-fn [md x y z])))
 
 (defn typical-treatment-times []
@@ -100,7 +100,6 @@
       (rem (+ minute-0 duration-minute) 60)
       duration-seconds]]))
 
-
 (defn typical-stage-separation []
   (tuc/draw-normal 45 3))
 
@@ -112,3 +111,30 @@
                      [top bottom]))]
     (iterate next-fn extent-0)))
 
+;;; mean-traj-delta-x 824.6082 std-traj-delta-x 22.9065
+;;; mean-traj-delta-y 1048.7   std-traj-delta-y 0.6520
+;;; mean-traj-delta-z 1101.3   std-traj-delta-z 0.4614 
+
+;;; mean-traj-delta-x std-traj-delta-x
+;;;  73.4429           11.4000
+;;; 226.1058            6.4168
+;;; 153.4668            6.3606
+;;; 150.1713            8.0515
+
+;;; mean-traj-delta-y std-traj-delta-y
+;;; 139.0710          11.8006
+;;;  16.4374           7.9442
+;;; 311.8567          10.0601
+;;;  61.0152          3.8705
+
+;;; mean-traj-delta-z std-traj-delta-z
+;;; 110.1814           1.9290
+;;; 122.2491           3.7357
+;;; 111.6584           4.4176
+;;; 120.4373           3.5104
+
+(defn typical-interwell-distance [plot-angle]
+  (let [euclidean-distance (tuc/draw-normal 874 37)
+        x-distance (* euclidean-distance (Math/cos (* (/ (+ plot-angle 90) 180) Math.PI)))
+        y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) Math.PI)))]
+    [x-distance y-distance]))
