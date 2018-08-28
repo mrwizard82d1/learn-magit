@@ -107,17 +107,17 @@
          start-duration-min (int (* 60 (- start-duration start-duration-h)))
          start-duration-s (rand-nth (range 60))
          start [start-a start-mo start-d 
-                (+ start-h start-duration-h)
-                (+ start-min start-duration-min)
-                (+ start-s start-duration-s)]
+                (rem (+ start-h start-duration-h) 24) 
+                (rem (+ start-min start-duration-min) 60) 
+                start-duration-h]
          stop-duration (tuc/draw-normal 2.52 0.17)
          stop-duration-h (int stop-duration)
          stop-duration-min (int (* 60 (- stop-duration stop-duration-h)))
          stop-duration-s (rand-nth (range 60))
          stop [start-a start-mo start-d
-               (+ (nth start 3) stop-duration-h)
-               (+ (nth start 4) stop-duration-min)
-               (+ (nth start 5) stop-duration-s)]]
+               (rem (+ (nth start 3) stop-duration-h) 24)
+               (rem (+ (nth start 4) stop-duration-min) 60)
+               stop-duration-s]]
      [start stop])))
 
 (defn treatment-times []
