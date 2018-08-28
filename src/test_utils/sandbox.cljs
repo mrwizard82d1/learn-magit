@@ -88,9 +88,10 @@
                      (tuc/draw-normal z 4)]))]
     (iterate next-fn [md x y z])))
 
-(defn typical-treatment-times []
-  (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
-        duration-hours (tuc/draw-normal 2.5 0.25)
+(defn typical-treatment-time-range 
+  ([]
+   (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
+        duration-hours (tuc/draw-normal 2.52 0.17)
         duration-hour (int duration-hours)
         duration-minute (int (* 60 (- duration-hours duration-hour)))
         duration-seconds (rand-nth (range 60))]
@@ -99,6 +100,31 @@
       (rem (+ hour-0 duration-hour) 24)
       (rem (+ minute-0 duration-minute) 60)
       duration-seconds]]))
+  ([[start-a start-mo start-d start-h start-min start-s]
+    [stop-a stop-mo stop-d stop-h stop-min stop-s]]
+   (let [start-duration (tuc/draw-normal 5.7 1.37)
+         start-duration-h (int start-duration)
+         start-duration-min (int (* 60 (- start-duration start-duration-h)))
+         start-duration-s (rand-nth (range 60))
+         start [start-a start-mo start-d 
+                (+ start-h start-duration-h)
+                (+ start-min start-duration-min)
+                (+ start-s start-duration-s)]
+         stop-duration (tuc/draw-normal 2.52 0.17)
+         stop-duration-h (int stop-duration)
+         stop-duration-min (int (* 60 (- stop-duration stop-duration-h)))
+         stop-duration-s (rand-nth (range 60))
+         stop [start-a start-mo start-d
+               (+ (nth start 3) stop-duration-h)
+               (+ (nth start 4) stop-duration-min)
+               (+ (nth start 5) stop-duration-s)]]
+     [start stop])))
+
+(defn treatment-times []
+  (let [[start-0 stop-0] (typical-treatment-time-range)
+        next-fn (fn [[start-n-1 stop-n-1]]
+                  (typical-treatment-time-range start-n-1 stop-n-1))]
+    (iterate next-fn [start-0 stop-0])))
 
 (defn typical-stage-separation []
   (tuc/draw-normal 45 3))
