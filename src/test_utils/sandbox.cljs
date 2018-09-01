@@ -75,6 +75,12 @@
 (defn rand-stage-number []
   (inc (tuc/rand-2)))
 
+(defn rand-cluster-count []
+  (inc (rand-nth (range 2 7))))
+
+(defn rand-cluster-number []
+  (inc (rand-nth (range 7))))
+
 (defn typical-trajectory-md-length []
   (tuc/draw-normal 93.7 0.4))
 
@@ -164,3 +170,12 @@
         x-distance (* euclidean-distance (Math/cos (* (/ (+ plot-angle 90) 180) Math.PI)))
         y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) Math.PI)))]
     [x-distance y-distance]))
+
+(defn typical-isip []
+  (tuc/draw-normal 3102 497))
+
+(defn typical-inclination []
+  (tuc/draw-normal 92.2 2.4))
+
+(defn typical-azimuth [plot-angle]
+  (tuc/draw-normal plot-angle 1.24))
