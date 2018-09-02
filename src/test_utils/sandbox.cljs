@@ -126,44 +126,22 @@
                stop-duration-s]]
      [start stop])))
 
-(defn treatment-times []
-  (let [[start-0 stop-0] (typical-treatment-time-range)
-        next-fn (fn [[start-n-1 stop-n-1]]
-                  (typical-treatment-time-range start-n-1 stop-n-1))]
-    (iterate next-fn [start-0 stop-0])))
+    (defn treatment-times []
+    (let [[start-0 stop-0] (typical-treatment-time-range)
+            next-fn (fn [[start-n-1 stop-n-1]]
+                    (typical-treatment-time-range start-n-1 stop-n-1))]
+        (iterate next-fn [start-0 stop-0])))
 
-(defn typical-stage-separation []
-  (tuc/draw-normal 45 3))
+    (defn typical-stage-separation []
+    (tuc/draw-normal 45 3))
 
-(defn stage-extents []
-  (let [extent-0 (typical-stage-extent)
-        next-fn (fn [[top-n-1 bottom-n-1] extent-0]
-                   (let [bottom (- top-n-1 (typical-stage-separation))
-                         top (- bottom (typical-stage-length))]
-                     [top bottom]))]
-    (iterate next-fn extent-0)))
-
-;;; mean-traj-delta-x 824.6082 std-traj-delta-x 22.9065
-;;; mean-traj-delta-y 1048.7   std-traj-delta-y 0.6520
-;;; mean-traj-delta-z 1101.3   std-traj-delta-z 0.4614 
-
-;;; mean-traj-delta-x std-traj-delta-x
-;;;  73.4429           11.4000
-;;; 226.1058            6.4168
-;;; 153.4668            6.3606
-;;; 150.1713            8.0515
-
-;;; mean-traj-delta-y std-traj-delta-y
-;;; 139.0710          11.8006
-;;;  16.4374           7.9442
-;;; 311.8567          10.0601
-;;;  61.0152          3.8705
-
-;;; mean-traj-delta-z std-traj-delta-z
-;;; 110.1814           1.9290
-;;; 122.2491           3.7357
-;;; 111.6584           4.4176
-;;; 120.4373           3.5104
+    (defn stage-extents []
+    (let [extent-0 (typical-stage-extent)
+            next-fn (fn [[top-n-1 bottom-n-1] extent-0]
+                    (let [bottom (- top-n-1 (typical-stage-separation))
+                            top (- bottom (typical-stage-length))]
+                        [top bottom]))]
+        (iterate next-fn extent-0)))
 
 (defn typical-interwell-distance [plot-angle]
   (let [euclidean-distance (tuc/draw-normal 874 37)
@@ -179,3 +157,95 @@
 
 (defn typical-azimuth [plot-angle]
   (tuc/draw-normal plot-angle 1.24))
+
+(defn make-line-generator [[m b]]
+  (fn [t]
+    (+ (* m t) b)))
+
+(def p-mon-generator-parameters [[-1.8590e-02   2.8583e+02]
+                                 [-3.0727e-03   6.0814e+01]
+                                 [-4.6937e-03   1.0586e+02]
+                                 [7.9858e-03   9.6910e+00]
+                                 [7.9035e-02  -1.7834e+02]
+                                 [-7.5163e-03   1.6379e+02]
+                                 [-6.5209e-03   1.2149e+02]
+                                 [-7.1622e-03   1.1633e+02]
+                                 [-6.3279e-03   1.1242e+02]
+                                 [3.4088e-02  -4.6007e+01]
+                                 [-1.6031e-02   2.8456e+02]
+                                 [-3.3784e-03   1.0165e+02]
+                                 [2.7285e-02  -4.6048e+01]
+                                 [1.0749e-01  -1.2872e+02]
+                                 [-5.3974e-03   1.3903e+02]
+                                 [-3.6674e-03   7.7673e+01]
+                                 [-3.7600e-03   7.0792e+01]
+                                 [-2.6080e-03   4.3603e+01]
+                                 [-1.6967e-02   2.7267e+02]
+                                 [-1.0160e-02   1.6014e+02]
+                                 [-6.9151e-03   1.1013e+02]
+                                 [-2.8395e-03   5.2684e+01]
+                                 [1.4582e-04   1.4241e+01]
+                                 [1.4412e-03   1.1006e+01]
+                                 [2.0431e-02  -2.4441e+01]
+                                 [6.5569e-02  -1.0583e+02]
+                                 [-1.4590e-04   4.0460e+01]
+                                 [-4.1713e-03   8.6142e+01]
+                                 [-2.7311e-03   5.5830e+01]
+                                 [7.8723e-02  -3.5040e+02]
+                                 [-1.0843e-02   1.6752e+02]
+                                 [-3.3414e-03   5.9796e+01]
+                                 [-2.7253e-03   4.5386e+01]
+                                 [-1.6702e-03   2.4405e+01]])
+
+(defn rand-stage-time-point-seconds []
+  (let [time-seconds (* 3600 (tuc/draw-normal 2.52 0.17))]
+    (* time-seconds (rand))))
+
+(defn make-pressure-generator [generator-parameters]
+  (make-line-generator (rand-nth generator-parameters)))
+
+(defn rand-p-mon []
+  (let [generator (make-pressure-generator p-mon-generator-parameters)]
+    (generator (rand-stage-time-point-seconds))))
+
+;; (defn rand-delta-p-mon []
+;;   (tuc/rand-range 1704))
+
+(def delta-p-mon-generator-parameters [[-1.8590e-02   1.1321e+03]
+                                       [-3.0727e-03   7.1547e+02]
+                                       [-4.6937e-03   6.4841e+02]
+                                       [7.9858e-03   4.8889e+02]
+                                       [7.9035e-02   2.7188e+02]
+                                       [-7.5163e-03   1.1302e+03]
+                                       [-6.5209e-03   9.6394e+02]
+                                       [-7.1622e-03   8.3598e+02]
+                                       [-6.3279e-03   7.1826e+02]
+                                       [3.4088e-02   2.6802e+02]
+                                       [-1.6031e-02   1.1028e+03]
+                                       [-3.3784e-03   6.0276e+02]
+                                       [2.7285e-02   3.9359e+02]
+                                       [1.0749e-01   4.5376e+02]
+                                       [-5.3974e-03   1.2390e+03]
+                                       [-3.6674e-03   9.3976e+02]
+                                       [-3.7600e-03   8.0181e+02]
+                                       [-2.6080e-03   6.7863e+02]
+                                       [-1.6967e-02   8.1044e+02]
+                                       [-1.0160e-02   4.8040e+02]
+                                       [-6.9151e-03   3.0316e+02]
+                                       [-2.8395e-03   1.0520e+02]
+                                       [1.4582e-04   8.8145e+00]
+                                       [1.4412e-03  -8.9868e+00]
+                                       [2.0431e-02  -4.4215e+01]
+                                       [6.5569e-02   6.2604e+01]
+                                       [-1.4590e-04   7.8367e+02]
+                                       [-4.1713e-03   7.2263e+02]
+                                       [-2.7311e-03   5.9209e+02]
+                                       [7.8723e-02   1.2100e+02]
+                                       [-1.0843e-02   1.5910e+03]
+                                       [-3.3414e-03   1.4108e+03]
+                                       [-2.7253e-03   1.3492e+03]
+                                       [-1.6702e-03   1.2961e+03]])
+
+(defn rand-delta-p-mon []
+  (let [generator (make-pressure-generator delta-p-mon-generator-parameters)]
+    (generator (rand-stage-time-point-seconds))))
