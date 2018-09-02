@@ -204,12 +204,15 @@
 (defn make-pressure-generator [generator-parameters]
   (make-line-generator (rand-nth generator-parameters)))
 
-(defn rand-p-mon []
-  (let [generator (make-pressure-generator p-mon-generator-parameters)]
-    (generator (rand-stage-time-point-seconds))))
+(let [generator (make-pressure-generator p-mon-generator-parameters)]
+  (defn rand-p-mon
+    ([] (rand-p-mon (rand-stage-time-point-seconds)))
+    ([at-time] (generator at-time))))
 
-;; (defn rand-delta-p-mon []
-;;   (tuc/rand-range 1704))
+(defn p-mon-seq []
+  (let [start-at (rand-stage-time-point-seconds)
+        at-times (iterate (fn [t] (+ t 30)) start-at)]
+    (map #(rand-p-mon %) at-times)))
 
 (def delta-p-mon-generator-parameters [[-1.8590e-02   1.1321e+03]
                                        [-3.0727e-03   7.1547e+02]
@@ -246,6 +249,12 @@
                                        [-2.7253e-03   1.3492e+03]
                                        [-1.6702e-03   1.2961e+03]])
 
-(defn rand-delta-p-mon []
-  (let [generator (make-pressure-generator delta-p-mon-generator-parameters)]
-    (generator (rand-stage-time-point-seconds))))
+(let [generator (make-pressure-generator delta-p-mon-generator-parameters)]
+  (defn rand-delta-p-mon
+    ([] (rand-delta-p-mon (rand-stage-time-point-seconds)))
+    ([at-time] (generator at-time))))
+
+(defn delta-p-mon-seq []
+  (let [start-at (rand-stage-time-point-seconds)
+        at-times (iterate (fn [t] (+ t 30)) start-at)]
+    (map #(rand-delta-p-mon %) at-times)))
