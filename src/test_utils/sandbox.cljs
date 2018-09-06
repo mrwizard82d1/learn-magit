@@ -73,7 +73,7 @@
   (inc (tuc/rand-digit)))
 
 (defn rand-stage-number []
-  (inc (tuc/rand-2)))
+  (inc (rem (tuc/rand-2) 50)))
 
 (defn rand-cluster-count []
   (inc (rand-nth (range 2 7))))
