@@ -258,3 +258,12 @@
   (let [start-at (rand-stage-time-point-seconds)
         at-times (iterate (fn [t] (+ t 30)) start-at)]
     (map #(rand-delta-p-mon %) at-times)))
+
+(defn rand-fhl []
+  (tuc/draw-normal 773 106))
+
+(defn rand-fracture-height []
+  (tuc/draw-normal 246.8 63.0))
+
+(defn rand-ratio []
+  (tuc/draw-normal 3.09 0.42))
