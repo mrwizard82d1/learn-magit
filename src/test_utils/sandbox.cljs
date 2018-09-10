@@ -126,22 +126,24 @@
                stop-duration-s]]
      [start stop])))
 
-    (defn treatment-times []
-    (let [[start-0 stop-0] (typical-treatment-time-range)
-            next-fn (fn [[start-n-1 stop-n-1]]
-                    (typical-treatment-time-range start-n-1 stop-n-1))]
-        (iterate next-fn [start-0 stop-0])))
+(defn treatment-times 
+  ([] (treatment-times (typical-treatment-time-range)))
+  ([start-treatment-time-range]
+   (let [[start-0 stop-0] start-treatment-time-range
+         next-fn (fn [[start-n-1 stop-n-1]]
+                   (typical-treatment-time-range start-n-1 stop-n-1))]
+     (iterate next-fn [start-0 stop-0]))))
 
-    (defn typical-stage-separation []
-    (tuc/draw-normal 45 3))
+(defn typical-stage-separation []
+  (tuc/draw-normal 45 3))
 
-    (defn stage-extents []
-    (let [extent-0 (typical-stage-extent)
-            next-fn (fn [[top-n-1 bottom-n-1] extent-0]
-                    (let [bottom (- top-n-1 (typical-stage-separation))
-                            top (- bottom (typical-stage-length))]
-                        [top bottom]))]
-        (iterate next-fn extent-0)))
+(defn stage-extents []
+  (let [extent-0 (typical-stage-extent)
+        next-fn (fn [[top-n-1 bottom-n-1] extent-0]
+                  (let [bottom (- top-n-1 (typical-stage-separation))
+                        top (- bottom (typical-stage-length))]
+                    [top bottom]))]
+    (iterate next-fn extent-0)))
 
 (defn typical-interwell-distance [plot-angle]
   (let [euclidean-distance (tuc/draw-normal 874 37)
