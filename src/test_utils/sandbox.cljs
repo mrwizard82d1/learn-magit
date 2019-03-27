@@ -75,6 +75,12 @@
 (defn rand-stage-number []
   (inc (rem (tuc/rand-2) 50)))
 
+(defn rand-isip []
+  (Math/abs (tuc/draw-normal 5061 121)))
+
+(defn rand-shmin []
+  (Math/abs (tuc/draw-normal 2.29 0.05)))
+
 (defn rand-cluster-count []
   (inc (rand-nth (range 2 7))))
 
