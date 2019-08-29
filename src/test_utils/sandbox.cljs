@@ -338,3 +338,35 @@
           (tuc/draw-normal mean sigma))
         (= units :F)
         (+ (* (typical-monitor-temperature :C) 1.8) 32)))
+
+(defn typical-surface-treating-pressure [units]
+  (cond (= units :psi)
+        (let [typical-min 5000
+              typical-max 9000
+              mean (/ (+ typical-min typical-max) 2)
+              sigma (/ mean 3)]
+          (tuc/draw-normal mean sigma))
+        (= units :kPa)
+        (* (typical-surface-treating-pressure :psi) 6.89476)
+        (= units :MPa)
+        (/ (typical-surface-treating-pressure :kPa) 1000)))
+
+(defn typical-injection-rate [units]
+  (cond (= units :bbl-per-min)
+        (let [typical-min 75
+              typical-max 100
+              mean (/ (+ typical-min typical-max) 2)
+              sigma (/ mean 3)]
+          (tuc/draw-normal mean sigma))
+        (= units :l-per-s)
+        (let [typical-min 198.75
+              typical-max 265
+              mean (/ (+ typical-min typical-max) 2)
+              sigma (/ mean 3)]
+          (tuc/draw-normal mean sigma))
+        (= units :cu-ft-per-s)
+        (let [typical-min 7.05
+              typical-max 9.4
+              mean (/ (+ typical-min typical-max) 2)
+              sigma (/ mean 3)]
+          (tuc/draw-normal mean sigma))))
