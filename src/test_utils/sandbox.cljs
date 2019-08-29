@@ -320,3 +320,21 @@
 
 (defn rand-ratio []
   (tuc/draw-normal 3.09 0.42))
+
+(defn typical-monitor-pressure [units]
+  (cond (= units :psi)
+        (first (p-mon-seq))
+        (= units :kPa)
+        (* (typical-monitor-pressure :psi) 6.89476)
+        (= units :MPa)
+        (/ (typical-monitor-pressure :kPa) 1000)))
+
+(defn typical-monitor-temperature [units]
+  (cond (= units :C)
+        (let [typical-min 50
+              typical-max 80
+              mean (/ (+ typical-min typical-max) 2)
+              sigma (/ mean 3)]
+          (tuc/draw-normal mean sigma))
+        (= units :F)
+        (+ (* (typical-monitor-temperature :C) 1.8) 32)))
