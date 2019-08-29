@@ -370,3 +370,12 @@
               mean (/ (+ typical-min typical-max) 2)
               sigma (/ mean 3)]
           (tuc/draw-normal mean sigma))))
+
+(defn typical-proppant-concentration [units]
+   (cond (= units :ppga)
+         (let [typical-min 0.2
+               typical-max 10
+               mean (/ (+ typical-min typical-max) 2)
+               sigma (/ mean 3)]
+           (tuc/draw-normal mean sigma)))) 
+  
