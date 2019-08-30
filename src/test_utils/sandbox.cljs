@@ -329,27 +329,33 @@
         sigma (/ mean 6)]
     (tuc/draw-normal mean sigma)))
 
+(defn convert-units-f [from to]
+  (let [converter {[:psi :kPa] (partial * 6.89476)
+                   [:kPa :MPa] #(/ % 1000)
+                   [:C :F] #(+ (* % 1.8) 32)}]
+    (converter [from to])))
+
 (defn typical-monitor-pressure [units]
   (cond (= units :psi)
         (first (p-mon-seq))
         (= units :kPa)
-        (* (typical-monitor-pressure :psi) 6.89476)
+        ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
         (= units :MPa)
-        (/ (typical-monitor-pressure :kPa) 1000)))
+        ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
 
 (defn typical-monitor-temperature [units]
   (cond (= units :C)
         (value-from-typical-range 50 80)
         (= units :F)
-        (+ (* (typical-monitor-temperature :C) 1.8) 32)))
+        ((convert-units-f :C :F) (typical-monitor-temperature :C))))
 
 (defn typical-surface-treating-pressure [units]
   (cond (= units :psi)
         (value-from-typical-range 5000 9000)
         (= units :kPa)
-        (* (typical-surface-treating-pressure :psi) 6.89476)
+        ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
         (= units :MPa)
-        (/ (typical-surface-treating-pressure :kPa) 1000)))
+        ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
 
 (defn typical-injection-rate [units]
   (cond (or (= units :bbl-per-min)
