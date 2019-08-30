@@ -321,6 +321,14 @@
 (defn rand-ratio []
   (tuc/draw-normal 3.09 0.42))
 
+(defn value-from-typical-range [typical-min typical-max]
+  "Generate a normally-distributed, random value with the range typical-min to typical-max, inclusive."
+  {:pre (< typical-min typical-max)}
+  (let [mean (/ (+ typical-min typical-max) 2)
+        ;; Typical range (assumed normal) is within 3-sigma of the mean
+        sigma (/ mean 6)]
+    (tuc/draw-normal mean sigma)))
+
 (defn typical-monitor-pressure [units]
   (cond (= units :psi)
         (first (p-mon-seq))
@@ -331,51 +339,28 @@
 
 (defn typical-monitor-temperature [units]
   (cond (= units :C)
-        (let [typical-min 50
-              typical-max 80
-              mean (/ (+ typical-min typical-max) 2)
-              sigma (/ mean 3)]
-          (tuc/draw-normal mean sigma))
+        (value-from-typical-range 50 80)
         (= units :F)
         (+ (* (typical-monitor-temperature :C) 1.8) 32)))
 
 (defn typical-surface-treating-pressure [units]
   (cond (= units :psi)
-        (let [typical-min 5000
-              typical-max 9000
-              mean (/ (+ typical-min typical-max) 2)
-              sigma (/ mean 3)]
-          (tuc/draw-normal mean sigma))
+        (value-from-typical-range 5000 9000)
         (= units :kPa)
         (* (typical-surface-treating-pressure :psi) 6.89476)
         (= units :MPa)
         (/ (typical-surface-treating-pressure :kPa) 1000)))
 
 (defn typical-injection-rate [units]
-  (cond (= units :bbl-per-min)
-        (let [typical-min 75
-              typical-max 100
-              mean (/ (+ typical-min typical-max) 2)
-              sigma (/ mean 3)]
-          (tuc/draw-normal mean sigma))
+  (cond (or (= units :bbl-per-min)
+            (= units :bpm))
+        (value-from-typical-range 75 100)
         (= units :l-per-s)
-        (let [typical-min 198.75
-              typical-max 265
-              mean (/ (+ typical-min typical-max) 2)
-              sigma (/ mean 3)]
-          (tuc/draw-normal mean sigma))
+        (value-from-typical-range 198.75 265)
         (= units :cu-ft-per-s)
-        (let [typical-min 7.05
-              typical-max 9.4
-              mean (/ (+ typical-min typical-max) 2)
-              sigma (/ mean 3)]
-          (tuc/draw-normal mean sigma))))
+        (value-from-typical-range 7.05 9.4)))
 
 (defn typical-proppant-concentration [units]
    (cond (= units :ppga)
-         (let [typical-min 0.2
-               typical-max 10
-               mean (/ (+ typical-min typical-max) 2)
-               sigma (/ mean 3)]
-           (tuc/draw-normal mean sigma)))) 
+         (value-from-typical-range 0.2 10)))
   
