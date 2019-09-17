@@ -37,6 +37,10 @@
 (defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
 
+(defn typical-measured-depth []
+  (+ (tuc/draw-normal 8000 1216)
+     (* 5280 (rand))))
+
 (defn typical-toe-measured-depth []
   (tuc/draw-normal 18000 1500))
 
@@ -369,4 +373,14 @@
 (defn typical-proppant-concentration [units]
    (cond (= units :ppga)
          (value-from-typical-range 0.2 10)))
-  
+
+
+(defn rand-uwi []
+  (apply str 
+         (interpose "-" 
+                    (map str [(two-digit-zero-pad (tuc/rand-2))
+                              (tuc/rand-3)
+                              (tuc/rand-5)
+                              (two-digit-zero-pad (tuc/rand-2)) 
+                              (two-digit-zero-pad (tuc/rand-2))]))))
+
