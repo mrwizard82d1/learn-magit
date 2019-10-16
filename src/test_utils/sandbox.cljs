@@ -384,3 +384,12 @@
                               (two-digit-zero-pad (tuc/rand-2)) 
                               (two-digit-zero-pad (tuc/rand-2))]))))
 
+
+(defn rand-sensor-id []
+  (let [sensor-indicators ["mp" "mt" "tp", "pc", "ir"]
+        indicator (rand-nth sensor-indicators)
+        discriminator (tuc/rand-3)
+        separator (if (rand-nth [true false]) "-" "")]
+    (str indicator separator discriminator)))
+
+
