@@ -1,12 +1,6 @@
-(defproject test-utils-cljs "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
-  :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.9.946" :classifier "aot"]
-                 [kixi/stats "0.4.0"]]
-  :jvm-opts ^:replace ["-Xmx1g" "-server"]
-  :plugins [[lein-npm "0.6.1"]]
-  :npm {:dependencies [[source-map-support "0.3.2"]]}
-  :source-paths ["src" "target/classes"]
-  :clean-targets ["out" "release"]
-  :target-path "target")
+(defproject test-utils "0.1.0-SNAPSHOT"
+  :description "A set of Clojure modules for generating test data"
+  :license {:name "Apache"
+              :url "http://www.apache.org/licenses/"
+              :distribution :repo}
+  :dependencies [[Clojure "1.8.0"]])

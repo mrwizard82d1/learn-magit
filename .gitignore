@@ -1,16 +1,15 @@
-pom.xml
-pom.xml.asc
-*jar
-/lib/
-/classes/
-/target/
-/checkouts/
-.cljs_node_repl/
-.lein-deps-sum
-.lein-repl-history
-.lein-plugins/
-.lein-failures
-.nrepl-port
+# Generated 11/25/2019 7:58:54 PM
+/targets
+/checkouts
+/packages
+*.dll
+/src/**/*.exe
+/.nrepl-port
+/.repl
+/out
+
+# ignore emacs temp files
+\\#*
 
 # Ignore ClojureScript output file
 /out/
