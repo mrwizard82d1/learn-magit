@@ -99,18 +99,18 @@
                   (let [step (typical-trajectory-md-length)
                         step-angle (tuc/draw-normal plot-angle 14)]
                     [(+ md0 step)
-                     (+ x0 (* step (Math/cos (* (/ step-angle 180) Math.PI))))
-                     (+ y0 (* step (Math/sin (* (/ step-angle 180) Math.PI))))
+                     (+ x0 (* step (Math/cos (* (/ step-angle 180) #?(:cljs Math.PI)))))
+                     (+ y0 (* step (Math/sin (* (/ step-angle 180) #?(:cljs Math.PI)))))
                      (tuc/draw-normal z 4)]))]
     (iterate next-fn [md x y z])))
 
 (defn typical-treatment-time-range 
   ([]
    (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
-        duration-hours (tuc/draw-normal 2.52 0.17)
-        duration-hour (int duration-hours)
-        duration-minute (int (* 60 (- duration-hours duration-hour)))
-        duration-seconds (rand-nth (range 60))]
+         duration-hours (tuc/draw-normal 2.52 0.17)
+         duration-hour (int duration-hours)
+         duration-minute (int (* 60 (- duration-hours duration-hour)))
+         duration-seconds (rand-nth (range 60))]
     [start
      [year-0 month-0 day-0 
       (rem (+ hour-0 duration-hour) 24)
@@ -157,8 +157,8 @@
 
 (defn typical-interwell-distance [plot-angle]
   (let [euclidean-distance (tuc/draw-normal 874 37)
-        x-distance (* euclidean-distance (Math/cos (* (/ (+ plot-angle 90) 180) Math.PI)))
-        y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) Math.PI)))]
+        x-distance (* euclidean-distance (Math/cos (* (/ (+ plot-angle 90) 180) #?(:cljs Math.PI))))
+        y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) #?(:cljs Math.PI))))]
     [x-distance y-distance]))
 
 (defn typical-isip []
@@ -374,7 +374,6 @@
    (cond (= units :ppga)
          (value-from-typical-range 0.2 10)))
 
-
 (defn rand-uwi []
   (apply str 
          (interpose "-" 
@@ -383,7 +382,6 @@
                               (tuc/rand-5)
                               (two-digit-zero-pad (tuc/rand-2)) 
                               (two-digit-zero-pad (tuc/rand-2))]))))
-
 
 (defn rand-sensor-id []
   (let [sensor-indicators ["mp" "mt" "tp", "pc", "ir"]

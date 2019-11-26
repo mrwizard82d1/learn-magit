@@ -1,8 +1,8 @@
 (ns test-utils.address
-  (:require [test-utils.core :as tuc]
-            [test-utils.word-source :as ws]
-            [goog.string :as gstring]
-            [goog.string.format]))
+  #?(:cljs (:require [test-utils.core :as tuc]
+                     [test-utils.word-source :as ws]
+                     [goog.string :as gstring]
+                     [goog.string.format])))
 
 (defn house-number []
   (tuc/rand-4))
@@ -14,7 +14,12 @@
   (tuc/rand-5))
 
 (defn phone-number []
-  (str "1" (gstring/format "%02d" (tuc/rand-2))  "-" "555" "-01" (gstring/format "%02d" (tuc/rand-2))))
+  ;; North America phone numbers only. See https://en.wikipedia.org/wiki/North_American_Numbering_Plan.
+  ;; The generated phone numbers have the correct format but are **invalid**.
+  (str "1" #?(:cljs (gstring/format "%02d" (tuc/rand-2))) ;; area code - begins with 1
+       "-" "555" ;; central office, exchange, or exchange code
+       "-01" #?(:cljs (gstring/format "%02d" (tuc/rand-2))))) ;; line, subscriber, or station number
+
 
 (defn state []
   (let [abbreviations ["AL" "AK" "AZ" "AR" 

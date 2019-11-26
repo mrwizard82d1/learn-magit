@@ -1,10 +1,10 @@
 (ns test-utils.word-source
    (:require [clojure.string :as clj-str]))
 
-(def fs (js/require "fs"))
+#?(:cljs (def fs (js/require "fs")))
 
 (defn read-text-file [pathname]
-  (.readFileSync fs pathname "utf-8"))
+  #?(:cljs (.readFileSync fs pathname "utf-8")))
 
 (defn empty-string? [to-test]
   "Determine if to-test is an empty string."
