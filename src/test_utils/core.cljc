@@ -22,10 +22,14 @@
 
 (defn rand-alpha []
   "Return a random, alphabetic character."
-  (let [alpha-chars (map char(concat (range #?(:cljs (.charCodeAt "A"))
-                                            #?(:cljs (.charCodeAt "Z")))
-                               (range #?(:cljs (.charCodeAt "a"))
-                                      #?(:cljs (.charCodeAt "z")))))]
+  (let [alpha-chars (map char(concat (range #?(:cljs (.charCodeAt "A")
+                                               :default (int \A) )
+                                            #?(:cljs (.charCodeAt "Z")
+                                               :default (int \Z)))
+                               (range #?(:cljs (.charCodeAt "a")
+                                         :default (int \a))
+                                      #?(:cljs (.charCodeAt "z")
+                                         :default (int \z)))))]
     (nth alpha-chars (rand-range 0 (count alpha-chars)))))
 
 (defn rand-alphas
