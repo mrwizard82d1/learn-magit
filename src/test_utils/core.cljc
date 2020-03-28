@@ -1,5 +1,5 @@
 (ns test-utils.core
-  #?(:cljs (:require [kixi.stats.distribution :as ksd])))
+  (:require [kixi.stats.distribution :as ksd]))
 
 #?(:cljs (enable-console-print!))
 
@@ -13,7 +13,6 @@
 (def rand-7 (partial rand-int 1e7))
 (def rand-8 (partial rand-int 1e8))
 (def rand-9 (partial rand-int 1e9))
-(def rand-10 (partial rand-int 1e10))
 
 (defn rand-range
   "Return a random integer between begin and end (excluding end)."
@@ -22,10 +21,14 @@
 
 (defn rand-alpha []
   "Return a random, alphabetic character."
-  (let [alpha-chars (map char(concat (range #?(:cljs (.charCodeAt "A"))
-                                            #?(:cljs (.charCodeAt "Z")))
-                               (range #?(:cljs (.charCodeAt "a"))
-                                      #?(:cljs (.charCodeAt "z")))))]
+  (let [alpha-chars (map char(concat (range #?(:cljs (.charCodeAt "A")
+                                               :clj (int \A))
+                                            #?(:cljs (.charCodeAt "Z")
+                                               :clj (int \Z)))
+                               (range #?(:cljs (.charCodeAt "a")
+                                         :clj (int \a))
+                                      #?(:cljs (.charCodeAt "z")
+                                         :clj (int \z)))))]
     (nth alpha-chars (rand-range 0 (count alpha-chars)))))
 
 (defn rand-alphas
@@ -43,7 +46,7 @@
   "Draw a single value from the normal distribution with mean, `mu`
   (default 0.0), and standard deviation, `sigma` (default 1.0)."
   ([] (draw-normal 0.0 1.0))
-  ([mu sigma] #?(:cljs (ksd/draw (ksd/normal {:mu mu :sd sigma})))))
+  ([mu sigma] (ksd/draw (ksd/normal {:mu mu :sd sigma}))))
 
 (defn sample-normal
   "Return a sample of n (default 3) values from the normal distribution
@@ -51,5 +54,5 @@
   (default 1.0)."
   ([] (sample-normal 3 0.0 1.0))
   ([n] (sample-normal n 0.0 1.0))
-  ([n mu sigma] #?(:cljs (ksd/sample n (ksd/normal {:mu mu :sd sigma})))))
+  ([n mu sigma] (ksd/sample n (ksd/normal {:mu mu :sd sigma}))))
 
