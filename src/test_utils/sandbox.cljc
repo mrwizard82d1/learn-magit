@@ -1,6 +1,8 @@
 (ns test-utils.sandbox
-  (:require [test-utils.core :as tuc]
-            [test-utils.word-source :as ws]))
+  #?(:cljs (:require [test-utils.core :as tuc]
+                     [test-utils.word-source :as ws])
+     :clj (:require (test-utils [core :as tuc]
+                                [word-source :as ws]))))
 
 ;; Stuff I'm trying out
 
@@ -104,7 +106,7 @@
                      (tuc/draw-normal z 4)]))]
     (iterate next-fn [md x y z])))
 
-(defn typical-treatment-time-range 
+(defn typical-treatment-time-range
   ([]
    (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
          duration-hours (tuc/draw-normal 2.52 0.17)
@@ -112,7 +114,7 @@
          duration-minute (int (* 60 (- duration-hours duration-hour)))
          duration-seconds (rand-nth (range 60))]
     [start
-     [year-0 month-0 day-0 
+     [year-0 month-0 day-0
       (rem (+ hour-0 duration-hour) 24)
       (rem (+ minute-0 duration-minute) 60)
       duration-seconds]]))
@@ -122,9 +124,9 @@
          start-duration-h (int start-duration)
          start-duration-min (int (* 60 (- start-duration start-duration-h)))
          start-duration-s (rand-nth (range 60))
-         start [start-a start-mo start-d 
-                (rem (+ start-h start-duration-h) 24) 
-                (rem (+ start-min start-duration-min) 60) 
+         start [start-a start-mo start-d
+                (rem (+ start-h start-duration-h) 24)
+                (rem (+ start-min start-duration-min) 60)
                 start-duration-h]
          stop-duration (tuc/draw-normal 2.52 0.17)
          stop-duration-h (int stop-duration)
@@ -136,7 +138,7 @@
                stop-duration-s]]
      [start stop])))
 
-(defn treatment-times 
+(defn treatment-times
   ([] (treatment-times (typical-treatment-time-range)))
   ([start-treatment-time-range]
    (let [[start-0 stop-0] start-treatment-time-range
@@ -155,7 +157,7 @@
                     [top bottom]))]
     (iterate next-fn extent-0)))
 
-(defn typical-interwell-distance [plot-angle]
+(defn typical-inter-well-distance [plot-angle]
   (let [euclidean-distance (tuc/draw-normal 874 37)
         x-distance (* euclidean-distance (Math/cos (* (/ (+ plot-angle 90) 180) #?(:cljs Math.PI))))
         y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) #?(:cljs Math.PI))))]
@@ -375,12 +377,12 @@
          (value-from-typical-range 0.2 10)))
 
 (defn rand-uwi []
-  (apply str 
-         (interpose "-" 
+  (apply str
+         (interpose "-"
                     (map str [(two-digit-zero-pad (tuc/rand-2))
                               (tuc/rand-3)
                               (tuc/rand-5)
-                              (two-digit-zero-pad (tuc/rand-2)) 
+                              (two-digit-zero-pad (tuc/rand-2))
                               (two-digit-zero-pad (tuc/rand-2))]))))
 
 (defn rand-sensor-id []
