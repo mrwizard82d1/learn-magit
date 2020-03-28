@@ -4,12 +4,15 @@
 #?(:cljs (def fs (js/require "fs")))
 
 (defn read-text-file [pathname]
-  #?(:cljs (.readFileSync fs pathname "utf-8")))
+  #?(:cljs (.readFileSync fs pathname "utf-8"))
+  #?(:clj (slurp pathname)))
 
 (defn empty-string? [to-test]
   "Determine if to-test is an empty string."
   (and (string? to-test)
-       (== (.-length to-test) 0)))
+       (== #?(:cljs (.-length to-test))
+           #?(:clj (.length to-test))
+           0)))
 
 (defn parse-lines [text]
   (clj-str/split text #"\n"))
