@@ -316,7 +316,7 @@
 (defn delta-p-seq []
   (let [start-at (rand-stage-time-point-seconds)
         at-times (iterate (fn [t] (+ t 30)) start-at)]
-    (map #(rand-delta-p %) at-times)))
+    (map #(rand-delta-p %) at-times)))hA
 
 (defn rand-fhl []
   (tuc/draw-normal 773 106))
@@ -331,14 +331,15 @@
   "Generate a normally-distributed, random value with the range typical-min to typical-max, inclusive."
   {:pre (< typical-min typical-max)}
   (let [mean (/ (+ typical-min typical-max) 2)
-        ;; Typical range (assumed normal) is within 3-sigma of the mean
+          ;; Typical range (assumed normal) is within 3-sigma of the mean
         sigma (/ mean 6)]
     (tuc/draw-normal mean sigma)))
 
 (defn convert-units-f [from to]
   (let [converter {[:psi :kPa] (partial * 6.89476)
                    [:kPa :MPa] #(/ % 1000)
-                   [:C :F] #(+ (* % 1.8) 32)}]
+                   [:C :F] #(+ (* % 1.8) 32)
+                   [:ft :m] #(/ (* % 30.48) 100)}]
     (converter [from to])))
 
 (defn typical-monitor-pressure [units]
@@ -392,4 +393,12 @@
         separator (if (rand-nth [true false]) "-" "")]
     (str indicator separator discriminator)))
 
+(defn typical-fracture-size [units]
+  (cond (= units :ft)
+        [(value-from-typical-range 500 1000) (value-from-typical-range 100 150)]
+        (= units :m)
+        (map #(convert-units-f :ft :m) (typical-monitor-temperature :m))))
+
+(defn typical-fracture-azimuth []
+  (value-from-typical-range 0 180))
 
