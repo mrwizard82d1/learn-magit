@@ -316,7 +316,7 @@
 (defn delta-p-seq []
   (let [start-at (rand-stage-time-point-seconds)
         at-times (iterate (fn [t] (+ t 30)) start-at)]
-    (map #(rand-delta-p %) at-times)))hA
+    (map #(rand-delta-p %) at-times)))
 
 (defn rand-fhl []
   (tuc/draw-normal 773 106))
@@ -402,3 +402,6 @@
 (defn typical-fracture-azimuth []
   (value-from-typical-range 0 180))
 
+(defn typical-fracture-geometry []
+  (let [unit (rand-nth [:ft :m])]
+    [(map #(vector unit %) (typical-fracture-size unit)) (typical-fracture-azimuth)]))
