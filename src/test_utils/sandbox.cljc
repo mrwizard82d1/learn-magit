@@ -397,11 +397,28 @@
   (cond (= units :ft)
         [(value-from-typical-range 500 1000) (value-from-typical-range 100 150)]
         (= units :m)
-        (map #(convert-units-f :ft :m) (typical-monitor-temperature :m))))
+        (map (convert-units-f :ft :m) (typical-fracture-size :ft))))
 
 (defn typical-fracture-azimuth []
   (value-from-typical-range 0 180))
 
+(defn rand-length-unit []
+  (rand-nth [:ft :m]))
+
 (defn typical-fracture-geometry []
-  (let [unit (rand-nth [:ft :m])]
+  (let [unit (rand-length-unit)]
     [(map #(vector unit %) (typical-fracture-size unit)) (typical-fracture-azimuth)]))
+
+(defn typical-subsurface-location
+  ([] (typical-subsurface-location (rand-length-unit)))
+  ([length-unit]
+   (let [typical-location-in-ft [(rand-easting) (rand-northing) (typical-vertical-depth)]]
+     (if (= length-unit :ft)
+       [:ft typical-location-in-ft]
+       [:m (vec (map (convert-units-f :ft :m) typical-location-in-ft))]))))
+l
+(defn rand-well-reference-frame-xy []
+  (rand-nth [:project :well-head :absolute-state-plane]))
+
+(defn rand-depth-datum []
+  (rand-nth [:ground-level :kelly-bushing :sea-level]))
