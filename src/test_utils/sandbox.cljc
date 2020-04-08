@@ -416,7 +416,7 @@
      (if (= length-unit :ft)
        [:ft typical-location-in-ft]
        [:m (vec (map (convert-units-f :ft :m) typical-location-in-ft))]))))
-l
+
 (defn rand-well-reference-frame-xy []
   (rand-nth [:project :well-head :absolute-state-plane]))
 
