@@ -400,7 +400,7 @@
         (map (convert-units-f :ft :m) (typical-fracture-size :ft))))
 
 (defn typical-fracture-azimuth []
-  (value-from-typical-range 0 180))
+  (tuc/draw-normal 90 30))
 
 (defn rand-length-unit []
   (rand-nth [:ft :m]))

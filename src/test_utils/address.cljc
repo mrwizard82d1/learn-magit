@@ -24,7 +24,6 @@
        "-01" #?(:cljs (gstring/format "%02d" (tuc/rand-2))
                 :clj (format "%02d" (tuc/rand-2))))) ;; line, subscriber, or station number
 
-
 (defn state []
   (let [abbreviations ["AL" "AK" "AZ" "AR" 
                        "CA" "CO" "CT"
