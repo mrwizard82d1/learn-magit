@@ -405,9 +405,9 @@
 (defn rand-length-unit []
   (rand-nth [:ft :m]))
 
-(defn typical-fracture-geometry []
-  (let [unit (rand-length-unit)]
-    [(map #(vector unit %) (typical-fracture-size unit)) (typical-fracture-azimuth)]))
+(defn typical-fracture-geometry 
+  ([unit] [(map #(vector unit %) (typical-fracture-size unit)) (typical-fracture-azimuth)])
+  ([] (typical-fracture-geometry (rand-length-unit))))
 
 (defn typical-subsurface-location
   ([] (typical-subsurface-location (rand-length-unit)))
