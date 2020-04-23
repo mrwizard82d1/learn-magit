@@ -56,3 +56,8 @@
   ([n] (sample-normal n 0.0 1.0))
   ([n mu sigma] (ksd/sample n (ksd/normal {:mu mu :sd sigma}))))
 
+(defn two-digit-zero-pad [number]
+  (if (>= number 10)
+    number
+    (str "0" number)))
+
