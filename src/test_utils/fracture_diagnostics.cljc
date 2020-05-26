@@ -316,11 +316,13 @@
         (= units :MPa)
         ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
 
-(defn typical-monitor-temperature [units]
-  (cond (= units :C)
-        (value-from-typical-range 50 80)
-        (= units :F)
-        ((convert-units-f :C :F) (typical-monitor-temperature :C))))
+(defn typical-monitor-temperature
+  ([] (let [units (rand-nth [:C :F])]
+        (typical-monitor-temperature units)))
+  ([units] (cond (= units :C)
+                 (value-from-typical-range 50 80)
+                 (= units :F)
+                 ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
 
 (defn typical-surface-treating-pressure [units]
   (cond (= units :psi)
