@@ -324,9 +324,12 @@
                  (= units :F)
                  ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
 
+(defn rand-pressure-unit []
+  (rand-nth [:psi :kPa :MPa]))
+
 (defn typical-surface-treating-pressure
   ([]
-   (let [units (rand-nth [:psi :kPa :MPa])]
+   (let [units (rand-pressure-unit)]
      [units (typical-surface-treating-pressure units)]))
   ([units]
    (cond (= units :psi)
@@ -336,9 +339,19 @@
          (= units :MPa)
          ((convert-units-f :kPa :MPa) (/ (typical-monitor-pressure :kPa) 1000)))))
 
+(defn surface-treating-pressure-seq [arg]
+  (cond (int? arg)
+        (let [unit (rand-pressure-unit)]
+          [unit (take arg (surface-treating-pressure-seq unit))])
+        (keyword? arg)
+        (repeatedly (fn [] (typical-surface-treating-pressure arg)))))
+
+(defn rand-injection-rate-unit []
+  (rand-nth [:bbl-per-min :bpm :l-per-s :cu-ft-per-s]))
+
 (defn typical-injection-rate
   ([]
-   (let [units (rand-nth [:bbl-per-min :bpm :l-per-s :cu-ft-per-s])]
+   (let [units (rand-injection-rate-unit)]
      (typical-injection-rate units)))
   ([units]
    (cond (or (= units :bbl-per-min)
@@ -349,12 +362,26 @@
          (= units :cu-ft-per-s)
          (value-from-typical-range 7.05 9.4))))
 
+(defn injection-rate-seq [arg]
+  (cond (int? arg)
+        (let [unit (rand-injection-rate-unit)]
+          [unit (take arg (injection-rate-seq unit))])
+        (keyword? arg)
+        (repeatedly (fn [] (typical-injection-rate arg)))))
+
 (defn typical-proppant-concentration
   ([]
    [:ppga (typical-proppant-concentration :ppga)])
   ([units]
    (cond (= units :ppga)
          (value-from-typical-range 0.2 10))))
+
+(defn proppant-concentration-seq [arg]
+  (cond (int? arg)
+        (let [unit :ppga]
+          [unit (take arg (proppant-concentration-seq unit))])
+        (keyword? arg)
+        (repeatedly (fn [] (typical-proppant-concentration arg)))))
 
 (defn rand-uwi []
   (apply str
