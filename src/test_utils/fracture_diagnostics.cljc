@@ -324,26 +324,37 @@
                  (= units :F)
                  ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
 
-(defn typical-surface-treating-pressure [units]
-  (cond (= units :psi)
-        (value-from-typical-range 5000 9000)
-        (= units :kPa)
-        ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
-        (= units :MPa)
-        ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
+(defn typical-surface-treating-pressure
+  ([]
+   (let [units (rand-nth [:psi :kPa :MPa])]
+     [units (typical-surface-treating-pressure units)]))
+  ([units]
+   (cond (= units :psi)
+         (value-from-typical-range 5000 9000)
+         (= units :kPa)
+         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
+         (= units :MPa)
+         ((convert-units-f :kPa :MPa) (/ (typical-monitor-pressure :kPa) 1000)))))
 
-(defn typical-injection-rate [units]
-  (cond (or (= units :bbl-per-min)
-            (= units :bpm))
-        (value-from-typical-range 75 100)
-        (= units :l-per-s)
-        (value-from-typical-range 198.75 265)
-        (= units :cu-ft-per-s)
-        (value-from-typical-range 7.05 9.4)))
+(defn typical-injection-rate
+  ([]
+   (let [units (rand-nth [:bbl-per-min :bpm :l-per-s :cu-ft-per-s])]
+     (typical-injection-rate units)))
+  ([units]
+   (cond (or (= units :bbl-per-min)
+             (= units :bpm))
+         (value-from-typical-range 75 100)
+         (= units :l-per-s)
+         (value-from-typical-range 198.75 265)
+         (= units :cu-ft-per-s)
+         (value-from-typical-range 7.05 9.4))))
 
-(defn typical-proppant-concentration [units]
+(defn typical-proppant-concentration
+  ([]
+   [:ppga (typical-proppant-concentration :ppga)])
+  ([units]
    (cond (= units :ppga)
-         (value-from-typical-range 0.2 10)))
+         (value-from-typical-range 0.2 10))))
 
 (defn rand-uwi []
   (apply str
