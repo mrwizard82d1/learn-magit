@@ -306,6 +306,7 @@
                    [:kPa :MPa] #(/ % 1000)
                    [:C :F] #(+ (* % 1.8) 32)
                    [:ft :m] #(/ (* % 30.48) 100)}]
+
     (converter [from to])))
 
 (defn typical-monitor-pressure [units]
@@ -347,20 +348,19 @@
         (repeatedly (fn [] (typical-surface-treating-pressure arg)))))
 
 (defn rand-injection-rate-unit []
-  (rand-nth [:bbl-per-min :bpm :l-per-s :cu-ft-per-s]))
+  (rand-nth [:bbl-per-min :bpm :m3-per-min :m3/min]))
 
 (defn typical-injection-rate
   ([]
-   (let [units (rand-injection-rate-unit)]
-     (typical-injection-rate units)))
-  ([units]
-   (cond (or (= units :bbl-per-min)
-             (= units :bpm))
+   (let [unit (rand-injection-rate-unit)]
+     [unit (typical-injection-rate unit)]))
+  ([unit]
+   (cond (or (= unit :bbl-per-min)
+             (= unit :bpm))
          (value-from-typical-range 75 100)
-         (= units :l-per-s)
-         (value-from-typical-range 198.75 265)
-         (= units :cu-ft-per-s)
-         (value-from-typical-range 7.05 9.4))))
+         (or (= unit :m3-per-min)
+             (= unit :m3/min))
+         (value-from-typical-range 11.92 15.9))))
 
 (defn injection-rate-seq [arg]
   (cond (int? arg)
@@ -369,16 +369,25 @@
         (keyword? arg)
         (repeatedly (fn [] (typical-injection-rate arg)))))
 
+(defn rand-proppant-concentration-unit []
+  (rand-nth [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]))
+
 (defn typical-proppant-concentration
   ([]
-   [:ppga (typical-proppant-concentration :ppga)])
-  ([units]
-   (cond (= units :ppga)
-         (value-from-typical-range 0.2 10))))
+   (let [unit (rand-proppant-concentration-unit)]
+     [unit (typical-proppant-concentration unit)]))
+  ([unit]
+   (cond (or (= unit :lb-per-gal)
+             (= unit :lb/gal))
+         (value-from-typical-range 0.2 10)
+         (or (= unit :kg-per-m3)
+             (= unit :kg/m3))
+         (let [conversion (/ 0.453592 0.00378541)]
+           (value-from-typical-range (* 0.2 conversion) (* 10 conversion))))))
 
 (defn proppant-concentration-seq [arg]
   (cond (int? arg)
-        (let [unit :ppga]
+        (let [unit (rand-proppant-concentration-unit)]
           [unit (take arg (proppant-concentration-seq unit))])
         (keyword? arg)
         (repeatedly (fn [] (typical-proppant-concentration arg)))))
