@@ -63,10 +63,12 @@
 
 (defn grammar-case [] (rand-nth [:nom :gen :dat :acc :abl :voc]))
 
+(defn grammar-person [] (rand-nth [:1st :2nd :3rd]))
+
 (defn grammar-mood [] (rand-nth [:indicative :subjunctive :imperative :infinitive]))
 
 (defn grammar-tense [] (rand-nth [:present :imperfect :future :perfect :pluperfect :future-perfect]))
 
 (defn declension [] [(grammar-gender) (grammar-number) (grammar-case)])
 
-(defn conjugation [] [(grammar-mood) (grammar-number) (grammar-tense)])
+(defn conjugation [] [(grammar-person) (grammar-mood) (grammar-number) (grammar-tense)])
