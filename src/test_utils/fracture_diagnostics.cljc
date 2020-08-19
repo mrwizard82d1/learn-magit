@@ -309,13 +309,19 @@
 
     (converter [from to])))
 
-(defn typical-monitor-pressure [units]
-  (cond (= units :psi)
-        (first (p-mon-seq))
-        (= units :kPa)
-        ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
-        (= units :MPa)
-        ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
+(defn rand-pressure-unit []
+  (rand-nth [:psi :kPa :MPa]))
+
+(defn typical-monitor-pressure
+  ([units]
+   (cond (= units :psi)
+         (first (p-mon-seq))
+         (= units :kPa)
+         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
+         (= units :MPa)
+         ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
+  ([] (let [unit (rand-pressure-unit)]
+        [unit (typical-monitor-pressure unit)])))
 
 (defn typical-monitor-temperature
   ([] (let [units (rand-nth [:C :F])]
@@ -324,9 +330,6 @@
                  (value-from-typical-range 50 80)
                  (= units :F)
                  ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
-
-(defn rand-pressure-unit []
-  (rand-nth [:psi :kPa :MPa]))
 
 (defn typical-surface-treating-pressure
   ([]
