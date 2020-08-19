@@ -69,6 +69,8 @@
 
 (defn grammar-tense [] (rand-nth [:present :imperfect :future :perfect :pluperfect :future-perfect]))
 
-(defn declension [] [(grammar-number) (grammar-case)])
+(defn rand-declension [] [(grammar-number) (grammar-case)])
 
-(defn conjugation [] [(grammar-person) (grammar-mood) (grammar-number) (grammar-tense)])
+(defn rand-adj-declension [] [(grammar-gender) (grammar-number) (grammar-case)])
+
+(defn rand-conjugation [] [(grammar-person) (grammar-mood) (grammar-number) (grammar-tense)])
