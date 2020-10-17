@@ -309,8 +309,21 @@
                    [:m :ft] #(/ (* % 100) 30.48)}]
     (converter [from to])))
 
-(defn rand-pressure-unit []
-  (rand-nth [:psi :kPa :MPa]))
+(defn rand-unit [physical-quantity]
+  (let [quantity-units-map {:length [:ft :m]
+                            :mass [:lb :kg]
+                            :pressure [:psi :kPa :mPa]
+                            :volume [:bbl :m3]
+                            :injection-rate [:bbl-per-min :bpm :m3-per-min :m3/min]
+                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]}]
+    (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
+
+(def rand-length-unit (rand-unit :length))
+(def rand-mass-unit (rand-unit :mass))
+(def rand-pressure-unit (rand-unit :pressure))
+(def rand-volume-unit (rand-unit :volume))
+(def rand-injection-rate-unit (rand-unit :injection-rate))
+(def rand-proppant-concentration-unit (rand-unit :proppant-concentration))
 
 (defn typical-monitor-pressure
   ([units]
@@ -350,9 +363,6 @@
         (keyword? arg)
         (repeatedly (fn [] (typical-surface-treating-pressure arg)))))
 
-(defn rand-injection-rate-unit []
-  (rand-nth [:bbl-per-min :bpm :m3-per-min :m3/min]))
-
 (defn typical-injection-rate
   ([]
    (let [unit (rand-injection-rate-unit)]
@@ -371,9 +381,6 @@
           [unit (take arg (injection-rate-seq unit))])
         (keyword? arg)
         (repeatedly (fn [] (typical-injection-rate arg)))))
-
-(defn rand-proppant-concentration-unit []
-  (rand-nth [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]))
 
 (defn typical-proppant-concentration
   ([]
@@ -420,10 +427,7 @@
 (defn typical-fracture-azimuth []
   (tuc/draw-normal 90 30))
 
-(defn rand-length-unit []
-  (rand-nth [:ft :m]))
-
-(defn typical-fracture-geometry 
+(defn typical-fracture-geometry
   ([unit] [(map #(vector unit %) (typical-fracture-size unit)) (typical-fracture-azimuth)])
   ([] (typical-fracture-geometry (rand-length-unit))))
 
