@@ -305,8 +305,8 @@
   (let [converter {[:psi :kPa] (partial * 6.89476)
                    [:kPa :MPa] #(/ % 1000)
                    [:C :F] #(+ (* % 1.8) 32)
-                   [:ft :m] #(/ (* % 30.48) 100)}]
-
+                   [:ft :m] #(/ (* % 30.48) 100)
+                   [:m :ft] #(/ (* % 100) 30.48)}]
     (converter [from to])))
 
 (defn rand-pressure-unit []
@@ -440,3 +440,8 @@
 
 (defn rand-depth-datum []
   (rand-nth [:ground-level :kelly-bushing :sea-level]))
+
+(defn typical-kelly-bushing-elevation []
+  (tuc/draw-normal 30.48 (/ 1.00 3.00)))
+
+
