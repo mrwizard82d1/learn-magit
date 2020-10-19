@@ -312,7 +312,7 @@
 (defn rand-unit [physical-quantity]
   (let [quantity-units-map {:length [:ft :m]
                             :mass [:lb :kg]
-                            :pressure [:psi :kPa :mPa]
+                            :pressure [:psi :kPa :MPa]
                             :volume [:bbl :m3]
                             :injection-rate [:bbl-per-min :bpm :m3-per-min :m3/min]
                             :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]}]
@@ -448,4 +448,27 @@
 (defn typical-kelly-bushing-elevation []
   (tuc/draw-normal 30.48 (/ 1.00 3.00)))
 
+(defn typical-pumped-volume
+  ([] (let [volume-unit (rand-volume-unit)]
+        [(typical-pumped-volume volume-unit) volume-unit]))
+  ([volume-unit]
+   (condp = volume-unit
+     :bbl (tuc/draw-normal 6986.70 1992.30)
+     :m3 (tuc/draw-normal 813.47 286.89))))
 
+(defn typical-proppant-mass
+  ([] (let [mass-unit (rand-mass-unit)]
+        [(typical-proppant-mass mass-unit) mass-unit]))
+  ([mass-unit]
+   (condp = mass-unit
+     :lb (tuc/draw-normal 4962.77 1375.72)
+     :kg (tuc/draw-normal 135068.05 16421.44))))
+
+(defn typical-median-pressure
+  ([] (let [pressure-unit (rand-pressure-unit)]
+        [(typical-median-pressure pressure-unit) pressure-unit]))
+  ([pressure-unit]
+   (condp = pressure-unit
+     :psi (tuc/draw-normal 7569.89 663.65)
+     :kPa (tuc/draw-normal 64.1635 7.0987)
+     :MPa (/ (typical-median-pressure :kPa) 1000))))
