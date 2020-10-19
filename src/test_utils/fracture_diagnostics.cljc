@@ -302,11 +302,14 @@
     (tuc/draw-normal mean sigma)))
 
 (defn convert-units-f [from to]
-  (let [converter {[:psi :kPa] (partial * 6.89476)
+  (let [converter {[:ft :m] #(/ (* % 30.48) 100)
+                   [:m :ft] #(/ (* % 100) 30.48)
+                   [:bbl :m3] #(/ % 6.2898)
+                   [:m3 :bbl] #(* % 6.2898)
+                   [:psi :kPa] (partial * 6.89476)
                    [:kPa :MPa] #(/ % 1000)
-                   [:C :F] #(+ (* % 1.8) 32)
-                   [:ft :m] #(/ (* % 30.48) 100)
-                   [:m :ft] #(/ (* % 100) 30.48)}]
+                   [:C :F] #(+ (* % 1.8) 32)}]
+
     (converter [from to])))
 
 (defn rand-unit [physical-quantity]
