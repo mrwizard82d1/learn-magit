@@ -38,7 +38,8 @@
 (defn rand-minimal-xy-monitor-treatment-distance []
   (let [minimum-euclidean-distance 946.9745
         x-component (* minimum-euclidean-distance (rand))
-        y-component (Math/sqrt (- (* minimum-euclidean-distance minimum-euclidean-distance) (* x-component x-component)))]
+        y-component (Math/sqrt (- (* minimum-euclidean-distance minimum-euclidean-distance)
+                                  (* x-component x-component)))]
     [x-component y-component]))
 
 (defn rand-well-number []
