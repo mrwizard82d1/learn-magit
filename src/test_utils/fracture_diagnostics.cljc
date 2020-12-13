@@ -321,6 +321,11 @@
                    [:C :F] #(+ (* % 1.8) 32)}]
     (converter [from to])))
 
+(def physical-quantities [:length :mass :pressure :volume :injection-rate :proppant-concentration])
+
+(defn rand-physical-quantity []
+  (rand-nth physical-quantities))
+
 (defn rand-unit [physical-quantity]
   (let [quantity-units-map {:length [:ft :m]
                             :mass [:lb :kg]
