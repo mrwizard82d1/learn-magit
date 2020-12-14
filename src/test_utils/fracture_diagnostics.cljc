@@ -2,6 +2,25 @@
   #?(:cljs (:require [test-utils.core :as tuc])
      :clj (:require (test-utils [core :as tuc]))))
 
+(defn convert-units-f [from to]
+  (let [factors {[:m :ft] 3.28084
+                 [:kg :lb] 2.20462262185
+                 [:m3 :bbl] 6.28981077
+                 [:psi :kPa] 6.894757293168361
+                 [:M :k] 1000}
+        converter {[:ft :m] #(/ % (factors [:m :ft]))
+                   [:m :ft] #(* % (factors [:m :ft]))
+                   [:lb :kg] #(/ % (factors [:kg :lb]))
+                   [:kg :lb] #(* % (factors [:kg :lb]))
+                   [:bbl :m3] #(/ % (factors [:m3 :bbl]))
+                   [:m3 :bbl] #(* % (factors [:m3 :bbl]))
+                   [:psi :kPa] #(* % (factors [:psi :kPa]))
+                   [:kPa :psi] #(/ % (factors [:psi :kPa]))
+                   [:kPa :MPa] #(/ % (factors [:M :k]))
+                   [:MPa :kPa] #(* % (factors [:M :k]))
+                   [:C :F] #(+ (* % 1.8) 32)}]
+    (converter [from to])))
+
 (defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
 
@@ -15,8 +34,13 @@
 (defn typical-stage-top []
   (tuc/draw-normal 13750 2150))
 
-(defn typical-stage-length []
-  (tuc/draw-normal 152 17))
+(defn typical-stage-length
+  ([] (let [length-unit (rand-nth [:ft :m])]
+        [length-unit (typical-stage-length length-unit)]))
+  ([length-unit]
+   (condp = length-unit
+     :ft [:ft (tuc/draw-normal 152 17)]
+     :m [:m ((convert-units-f :ft :m) (nth (typical-stage-length :ft)))])))
 
 (defn typical-stage-extent
   ([]
@@ -301,25 +325,6 @@
           ;; Typical range (assumed normal) is within 3-sigma of the mean
         sigma (/ mean 6)]
     (tuc/draw-normal mean sigma)))
-
-(defn convert-units-f [from to]
-  (let [factors {[:m :ft] 3.28084
-                 [:kg :lb] 2.20462262185
-                 [:m3 :bbl] 6.28981077
-                 [:psi :kPa] 6.894757293168361
-                 [:M :k] 1000}
-        converter {[:ft :m] #(/ % (factors [:m :ft]))
-                   [:m :ft] #(* % (factors [:m :ft]))
-                   [:lb :kg] #(/ % (factors [:kg :lb]))
-                   [:kg :lb] #(* % (factors [:kg :lb]))
-                   [:bbl :m3] #(/ % (factors [:m3 :bbl]))
-                   [:m3 :bbl] #(* % (factors [:m3 :bbl]))
-                   [:psi :kPa] #(* % (factors [:psi :kPa]))
-                   [:kPa :psi] #(/ % (factors [:psi :kPa]))
-                   [:kPa :MPa] #(/ % (factors [:M :k]))
-                   [:MPa :kPa] #(* % (factors [:M :k]))
-                   [:C :F] #(+ (* % 1.8) 32)}]
-    (converter [from to])))
 
 (def physical-quantities [:length :mass :pressure :volume :injection-rate :proppant-concentration])
 
