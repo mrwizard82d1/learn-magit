@@ -2,12 +2,33 @@
   #?(:cljs (:require [test-utils.core :as tuc])
      :clj (:require (test-utils [core :as tuc]))))
 
+(def physical-quantities [:length :mass :pressure :volume :slurry-rate :proppant-concentration])
+
+(defn rand-physical-quantity []
+  (rand-nth physical-quantities))
+
+(defn rand-unit [physical-quantity]
+  (let [quantity-units-map {:length [:ft :m]
+                            :mass [:lb :kg]
+                            :pressure [:psi :kPa :MPa]
+                            :volume [:bbl :m3]
+                            :slurry-rate [:bbl-per-min :bpm :m3-per-min :m3/min]
+                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]}]
+    (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
+
+(def rand-length-unit (rand-unit :length))
+(def rand-mass-unit (rand-unit :mass))
+(def rand-pressure-unit (rand-unit :pressure))
+(def rand-volume-unit (rand-unit :volume))
+(def rand-slurry-rate-unit (rand-unit :slurry-rate))
+(def rand-proppant-concentration-unit (rand-unit :proppant-concentration))
 (defn convert-units-f [from to]
   (let [factors {[:m :ft] 3.28084
                  [:kg :lb] 2.20462262185
                  [:m3 :bbl] 6.28981077
                  [:psi :kPa] 6.894757293168361
-                 [:M :k] 1000}
+                 [:M :k] 1000
+                 [:lb-per-gal :kg-per-m3] 119.826}
         converter {[:ft :m] #(/ % (factors [:m :ft]))
                    [:m :ft] #(* % (factors [:m :ft]))
                    [:lb :kg] #(/ % (factors [:kg :lb]))
@@ -18,6 +39,10 @@
                    [:kPa :psi] #(/ % (factors [:psi :kPa]))
                    [:kPa :MPa] #(/ % (factors [:M :k]))
                    [:MPa :kPa] #(* % (factors [:M :k]))
+                   [:lb-per-gal :kg-per-m3] #(* % (factors [:lb-per-gal :kg-per-m3]))
+                   [:kg-per-m3 :lb-per-gal] #(/ % (factors [:lb-per-gal :kg-per-m3]))
+                   [:m3-per-min :bbl-per-min] #(* % (factors [:m3 :bbl]))
+                   [:bbl-per-min :m3-per-min] #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:C :F] #(+ (* % 1.8) 32)}]
     (converter [from to])))
 
@@ -35,12 +60,11 @@
   (tuc/draw-normal 13750 2150))
 
 (defn typical-stage-length
-  ([] (let [length-unit (rand-nth [:ft :m])]
-        [length-unit (typical-stage-length length-unit)]))
+  ([] (typical-stage-length (rand-length-unit)))
   ([length-unit]
    (condp = length-unit
-     :ft [:ft (tuc/draw-normal 152 17)]
-     :m [:m ((convert-units-f :ft :m) (nth (typical-stage-length :ft)))])))
+     :ft [(tuc/draw-normal 152 17) :ft]
+     :m [((convert-units-f :ft :m) (nth (typical-stage-length :ft) 0)) :m])))
 
 (defn typical-stage-extent
   ([]
@@ -326,27 +350,6 @@
         sigma (/ mean 6)]
     (tuc/draw-normal mean sigma)))
 
-(def physical-quantities [:length :mass :pressure :volume :injection-rate :proppant-concentration])
-
-(defn rand-physical-quantity []
-  (rand-nth physical-quantities))
-
-(defn rand-unit [physical-quantity]
-  (let [quantity-units-map {:length [:ft :m]
-                            :mass [:lb :kg]
-                            :pressure [:psi :kPa :MPa]
-                            :volume [:bbl :m3]
-                            :injection-rate [:bbl-per-min :bpm :m3-per-min :m3/min]
-                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]}]
-    (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
-
-(def rand-length-unit (rand-unit :length))
-(def rand-mass-unit (rand-unit :mass))
-(def rand-pressure-unit (rand-unit :pressure))
-(def rand-volume-unit (rand-unit :volume))
-(def rand-injection-rate-unit (rand-unit :injection-rate))
-(def rand-proppant-concentration-unit (rand-unit :proppant-concentration))
-
 (defn typical-monitor-pressure
   ([units]
    (cond (= units :psi)
@@ -385,37 +388,39 @@
         (keyword? arg)
         (repeatedly (fn [] (typical-surface-treating-pressure arg)))))
 
-(defn typical-injection-rate
+(defn typical-slurry-rate
   ([]
-   (let [unit (rand-injection-rate-unit)]
-     [unit (typical-injection-rate unit)]))
+   (let [unit (rand-slurry-rate-unit)]
+     (typical-slurry-rate unit)))
   ([unit]
-   (cond (or (= unit :bbl-per-min)
-             (= unit :bpm))
-         (value-from-typical-range 75 100)
-         (or (= unit :m3-per-min)
-             (= unit :m3/min))
-         (value-from-typical-range 11.92 15.9))))
+   (let [typical-value (cond (or (= unit :bbl-per-min)
+                                 (= unit :bpm))
+                             (value-from-typical-range 75 100)
+                             (or (= unit :m3-per-min)
+                                 (= unit :m3/min))
+                             (value-from-typical-range 11.92 15.9))]
+     [typical-value unit])))
 
-(defn injection-rate-seq [arg]
+(defn slurry-rate-seq [arg]
   (cond (int? arg)
-        (let [unit (rand-injection-rate-unit)]
-          [unit (take arg (injection-rate-seq unit))])
+        (let [unit (rand-slurry-rate-unit)]
+          [unit (take arg (slurry-rate-seq unit))])
         (keyword? arg)
-        (repeatedly (fn [] (typical-injection-rate arg)))))
+        (repeatedly (fn [] (typical-slurry-rate arg)))))
 
 (defn typical-proppant-concentration
   ([]
    (let [unit (rand-proppant-concentration-unit)]
-     [unit (typical-proppant-concentration unit)]))
+     (typical-proppant-concentration unit)))
   ([unit]
-   (cond (or (= unit :lb-per-gal)
-             (= unit :lb/gal))
-         (value-from-typical-range 0.2 10)
-         (or (= unit :kg-per-m3)
-             (= unit :kg/m3))
-         (let [conversion (/ 0.453592 0.00378541)]
-           (value-from-typical-range (* 0.2 conversion) (* 10 conversion))))))
+   (let [typical-value (cond (or (= unit :lb-per-gal)
+                                 (= unit :lb/gal))
+                             (value-from-typical-range 0.2 10)
+                             (or (= unit :kg-per-m3)
+                                 (= unit :kg/m3))
+                             (let [conversion (/ 0.453592 0.00378541)]
+                                (value-from-typical-range (* 0.2 conversion) (* 10 conversion))))]
+     [typical-value unit])))AbstractMethodError
 
 (defn proppant-concentration-seq [arg]
   (cond (int? arg)
