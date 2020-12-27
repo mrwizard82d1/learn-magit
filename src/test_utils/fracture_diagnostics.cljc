@@ -15,18 +15,18 @@
   (rand-nth physical-quantities))
 
 (defn rand-unit [physical-quantity]
-  (let [quantity-units-map {:density [:lb-per-cu-ft :kg-per-m3]
-                            :length [:ft :m]
-                            :mass [:lb :kg]
-                            :pressure [:psi :kPa :MPa]
+  (let [quantity-units-map {:density                [:lb-per-cu-ft :kg-per-m3]
+                            :energy                 [:ft-lb :J]
+                            :length                 [:ft :m]
+                            :mass                   [:lb :kg]
+                            :pressure               [:psi :kPa :MPa]
                             :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]
-                            :slurry-rate [:bbl-per-min :bpm :m3-per-min :m3/min]
-                            :volume [:bbl :m3]}]
-
-
+                            :slurry-rate            [:bbl-per-min :bpm :m3-per-min :m3/min]
+                            :volume                 [:bbl :m3]}]
     (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
 
 (def rand-density-unit (rand-unit :density))
+(def rand-energy-unit (rand-unit :energy))
 (def rand-length-unit (rand-unit :length))
 (def rand-mass-unit (rand-unit :mass))
 (def rand-pressure-unit (rand-unit :pressure))
@@ -520,29 +520,29 @@
 (defn typical-density
   ([]
    (let [density-unit (rand-density-unit)
-         substance (rand-nth substances)]
+         substance    (rand-nth substances)]
      (typical-density density-unit substance)))
   ([density-unit-or-substance]
-   (let [is-density-unit (fn [to-test] (#{:kg-per-m3 :lb-per-cu-ft} to-test))
-         is-substance (fn [to-test] ((set substances) to-test))
+   (let [is-density-unit          (fn [to-test] (#{:kg-per-m3 :lb-per-cu-ft} to-test))
+         is-substance             (fn [to-test] ((set substances) to-test))
          [density-unit substance] (cond
-                                      (is-density-unit density-unit-or-substance)
-                                      [density-unit-or-substance (rand-nth substances)]
-                                      (is-substance density-unit-or-substance)
-                                      [(rand-nth [:kg-per-m3 :lb-per-cu-ft]) density-unit-or-substance])]
+                                    (is-density-unit density-unit-or-substance)
+                                    [density-unit-or-substance (rand-nth substances)]
+                                    (is-substance density-unit-or-substance)
+                                    [(rand-nth [:kg-per-m3 :lb-per-cu-ft]) density-unit-or-substance])]
      (typical-density density-unit substance)))
   ([density-unit substance]
    (condp = density-unit
      :lb-per-cu-ft (let [[density density-unit substance] (typical-density :kg-per-m3)]
                      [((convert-units-f :kg-per-m3 :lb-per-cu-ft) density) :lb-per-cu-ft substance])
-     :kg-per-m3 (condp = substance
+     :kg-per-m3    (condp = substance
                   ;; Typical values for different substances taken from
                   ;; https://serc.carleton.edu/mathyouneed/density/index.html#:~:text=Typical%20densities%20for%20gasses%20are,or%207%20g%2Fcm3.
                   ;; accessed on 23-Dec-2020. Additionally, the data for metals was taken from
                   ;; https://theengineeringmindset.com/density-of-metals/ accessed on 23-Dec-2020.
-                  (let [density (condp = substance
-                                  :gas (tuc/draw-normal 1 0.11)
-                                  :liquid (tuc/draw-normal 1000 110)
-                                  :rock (tuc/draw-normal 3000 330)
-                                  :metal (tuc/draw-normal) 10355 5431)]
-                    [density density-unit substance])))))
+                     (let [density (condp = substance
+                                     :gas    (tuc/draw-normal 1 0.11)
+                                     :liquid (tuc/draw-normal 1000 110)
+                                     :rock   (tuc/draw-normal 3000 330)
+                                     :metal  (tuc/draw-normal) 10355 5431)]
+                       [density density-unit substance])))))
