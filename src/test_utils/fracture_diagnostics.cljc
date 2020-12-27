@@ -2,7 +2,14 @@
   #?(:cljs (:require [test-utils.core :as tuc])
      :clj (:require (test-utils [core :as tuc]))))
 
-(def physical-quantities [:length :mass :pressure :volume :slurry-rate :proppant-concentration])
+(def physical-quantities [:densty
+                          :energy
+                          :length
+                          :mass
+                          :pressure
+                          :proppant-concentration
+                          :slurry-rate
+                          :volume])
 
 (defn rand-physical-quantity []
   (rand-nth physical-quantities))
@@ -539,6 +546,3 @@
                                   :rock (tuc/draw-normal 3000 330)
                                   :metal (tuc/draw-normal) 10355 5431)]
                     [density density-unit substance])))))
-
-
-
