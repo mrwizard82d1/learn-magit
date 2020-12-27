@@ -39,6 +39,7 @@
 
 (defn convert-units-f [from to]
   (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
+                   [:ft-lb :J]                1.35582
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
                    [:psi :kPa]                6.894757293168361
@@ -47,6 +48,8 @@
                    [:m3 :bbl]                 6.28981077}
         converter {[:lb-per-cu-ft :kg-per-m3] #(* % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
+                   [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
+                   [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
