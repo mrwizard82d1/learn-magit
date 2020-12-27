@@ -19,7 +19,7 @@
                             :energy                 [:ft-lb :J]
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
-                            :pressure               [:psi :kPa :MPa]
+                            :pressure               [:psi :kPa]
                             :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]
                             :slurry-rate            [:bbl-per-min :bpm :m3-per-min :m3/min]
                             :volume                 [:bbl :m3]}]
@@ -35,30 +35,27 @@
 (def rand-volume-unit (rand-unit :volume))
 
 (defn convert-units-f [from to]
-  (let [factors {[:m :ft] 3.28084
-                 [:kg :lb] 2.20462262185
-                 [:m3 :bbl] 6.28981077
-                 [:psi :kPa] 6.894757293168361
-                 [:M :k] 1000
-                 [:lb-per-gal :kg-per-m3] 119.826
-                 [:lb-per-cu-ft :kg-per-m3] 16.0185}
-        converter {[:ft :m] #(/ % (factors [:m :ft]))
-                   [:m :ft] #(* % (factors [:m :ft]))
-                   [:lb :kg] #(/ % (factors [:kg :lb]))
-                   [:kg :lb] #(* % (factors [:kg :lb]))
-                   [:bbl :m3] #(/ % (factors [:m3 :bbl]))
-                   [:m3 :bbl] #(* % (factors [:m3 :bbl]))
-                   [:psi :kPa] #(* % (factors [:psi :kPa]))
-                   [:kPa :psi] #(/ % (factors [:psi :kPa]))
-                   [:kPa :MPa] #(/ % (factors [:M :k]))
-                   [:MPa :kPa] #(* % (factors [:M :k]))
-                   [:lb-per-gal :kg-per-m3] #(* % (factors [:lb-per-gal :kg-per-m3]))
-                   [:kg-per-m3 :lb-per-gal] #(/ % (factors [:lb-per-gal :kg-per-m3]))
+  (let [factors   {[:m :ft]                   3.28084
+                   [:kg :lb]                  2.20462262185
+                   [:m3 :bbl]                 6.28981077
+                   [:psi :kPa]                6.894757293168361
+                   [:lb-per-gal :kg-per-m3]   119.826
+                   [:lb-per-cu-ft :kg-per-m3] 16.0185}
+        converter {[:ft :m]                   #(/ % (factors [:m :ft]))
+                   [:m :ft]                   #(* % (factors [:m :ft]))
+                   [:lb :kg]                  #(/ % (factors [:kg :lb]))
+                   [:kg :lb]                  #(* % (factors [:kg :lb]))
+                   [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
+                   [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))
+                   [:psi :kPa]                #(* % (factors [:psi :kPa]))
+                   [:kPa :psi]                #(/ % (factors [:psi :kPa]))
+                   [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
+                   [:kg-per-m3 :lb-per-gal]   #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:m3-per-min :bbl-per-min] #(* % (factors [:m3 :bbl]))
                    [:bbl-per-min :m3-per-min] #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:lb-per-cu-ft :kg-per-m3] #(* % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
-                   [:C :F] #(+ (* % 1.8) 32)}]
+                   [:C :F]                    #(+ (* % 1.8) 32)}]
     (converter [from to])))
 
 (defn typical-vertical-depth []
