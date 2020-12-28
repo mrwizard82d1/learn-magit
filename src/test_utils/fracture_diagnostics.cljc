@@ -541,13 +541,21 @@
      :lb-per-cu-ft (let [[density density-unit substance] (typical-density :kg-per-m3)]
                      [((convert-units-f :kg-per-m3 :lb-per-cu-ft) density) :lb-per-cu-ft substance])
      :kg-per-m3    (condp = substance
-                  ;; Typical values for different substances taken from
-                  ;; https://serc.carleton.edu/mathyouneed/density/index.html#:~:text=Typical%20densities%20for%20gasses%20are,or%207%20g%2Fcm3.
-                  ;; accessed on 23-Dec-2020. Additionally, the data for metals was taken from
-                  ;; https://theengineeringmindset.com/density-of-metals/ accessed on 23-Dec-2020.
+                     ;; Typical values for different substances taken from
+                     ;; https://serc.carleton.edu/mathyouneed/density/index.html#:~:text=Typical%20densities%20for%20gasses%20are,or%207%20g%2Fcm3.
+                     ;; accessed on 23-Dec-2020. Additionally, the data for metals was taken from
+                     ;; https://theengineeringmindset.com/density-of-metals/ accessed on 23-Dec-2020.
                      (let [density (condp = substance
                                      :gas    (tuc/draw-normal 1 0.11)
                                      :liquid (tuc/draw-normal 1000 110)
                                      :rock   (tuc/draw-normal 3000 330)
                                      :metal  (tuc/draw-normal) 10355 5431)]
                        [density density-unit substance])))))
+
+(defn typical-total-pump-energy
+  ([]
+   (typical-total-pump-energy (rand-energy-unit)))
+  ([energy-unit]
+   (condp = energy-unit
+     :ft-lb [:ft-lb (tuc/draw-normal 4.340741e10 1.443922e10)]
+     :J     [:J (tuc/draw-normal 14670.972535 5275.739520)])))
