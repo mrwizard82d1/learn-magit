@@ -538,7 +538,7 @@
      (typical-density density-unit substance)))
   ([density-unit substance]
    (condp = density-unit
-     :lb-per-cu-ft (let [[density density-unit substance] (typical-density :kg-per-m3)]
+     :lb-per-cu-ft (let [[density _ substance] (typical-density :kg-per-m3)]
                      [((convert-units-f :kg-per-m3 :lb-per-cu-ft) density) :lb-per-cu-ft substance])
      :kg-per-m3    (condp = substance
                      ;; Typical values for different substances taken from
