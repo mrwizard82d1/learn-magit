@@ -4,6 +4,7 @@
 
 (def physical-quantities [:densty
                           :energy
+                          :force
                           :length
                           :mass
                           :pressure
@@ -18,6 +19,7 @@
 (defn rand-unit [physical-quantity]
   (let [quantity-units-map {:density                [:lb-per-cu-ft :kg-per-m3]
                             :energy                 [:ft-lb :J]
+                            :force                  [:lbf :N]
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
                             :pressure               [:psi :kPa]
@@ -29,6 +31,7 @@
 
 (def rand-density-unit (rand-unit :density))
 (def rand-energy-unit (rand-unit :energy))
+(def rand-force-unit (rand-unit :force))
 (def rand-length-unit (rand-unit :length))
 (def rand-mass-unit (rand-unit :mass))
 (def rand-pressure-unit (rand-unit :pressure))
@@ -40,6 +43,7 @@
 (defn convert-units-f [from to]
   (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
                    [:ft-lb :J]                1.35582
+                   [:lbf :N]                  4.44822
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
                    [:psi :kPa]                6.894757293168361
@@ -50,6 +54,8 @@
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
+                   [:lbf :N]                  #(* % (factors [:lbf :N]))
+                   [:N :lbf]                  #(/ % (factors [:lbf :N]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
@@ -559,3 +565,19 @@
    (condp = energy-unit
      :ft-lb [:ft-lb (tuc/draw-normal 4.340741e10 1.443922e10)]
      :J     [:J (tuc/draw-normal 14670.972535 5275.739520)])))
+
+(defn typical-force
+  ([] (typical-force (rand-force-unit)))
+  ([force-unit]
+   ;; Retrieved from http://www.excoresources.com/appalachia/ and
+   ;; https://en.wikipedia.org/wiki/Casing_string on 28-Dec-2020.
+   (let [typical-casing-outer-diameter-inches (+ 5 (/ 1 2))
+         typical-casing-pipe-witdth-inches    0.545
+         typical-casing-inner-diameter-inches (- typical-casing-outer-diameter-inches
+                                                 typical-casing-pipe-witdth-inches)
+         typical-casing-area-sq-inches        (* 2 Math/PI (/ typical-casing-inner-diameter-inches 2))
+         typical-pressure-psi                 (typical-surface-treating-pressure :psi)
+         typical-force-lbf                    (* typical-pressure-psi typical-casing-area-sq-inches)]
+     (condp = force-unit
+       :lbf [typical-force-lbf force-unit]
+       :N   [((convert-units-f :lbf :N) typical-force-lbf) force-unit]))))
