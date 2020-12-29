@@ -7,6 +7,7 @@
                           :force
                           :length
                           :mass
+                          :power
                           :pressure
                           :proppant-concentration
                           :slurry-rate
@@ -22,6 +23,7 @@
                             :force                  [:lbf :N]
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
+                            :power                  [:hp :W]
                             :pressure               [:psi :kPa]
                             :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]
                             :slurry-rate            [:bbl-per-min :bpm :m3-per-min :m3/min]
@@ -34,6 +36,7 @@
 (def rand-force-unit (rand-unit :force))
 (def rand-length-unit (rand-unit :length))
 (def rand-mass-unit (rand-unit :mass))
+(def rand-power-unit (rand-unit :power))
 (def rand-pressure-unit (rand-unit :pressure))
 (def rand-proppant-concentration-unit (rand-unit :proppant-concentration))
 (def rand-slurry-rate-unit (rand-unit :slurry-rate))
@@ -46,6 +49,7 @@
                    [:lbf :N]                  4.44822
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
+                   [:hp :W]                   745.69987158227022
                    [:psi :kPa]                6.894757293168361
                    [:lb-per-gal :kg-per-m3]   119.826
                    ;; slurry rate conversion not needed (use [:bbl :m3])
@@ -54,12 +58,14 @@
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
-                   [:lbf :N]                  #(* % (factors [:lbf :N]))
-                   [:N :lbf]                  #(/ % (factors [:lbf :N]))
+                   [:lbf :W]                  #(* % (factors [:lbf :W]))
+                   [:W :lbf]                  #(/ % (factors [:lbf :W]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
                    [:m :ft]                   #(* % (factors [:m :ft]))
-                   [:lb :kg]                  #(/ % (factors [:kg :lb]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
+                   [:lb :kg]                  #(/ % (factors [:kg :lb]))
+                   [:hp :W]                   #(* % (factors [:hp :W]))
+                   [:W :hp]                   #(/ % (factors [:hp :W]))
                    [:psi :kPa]                #(* % (factors [:psi :kPa]))
                    [:kPa :psi]                #(/ % (factors [:psi :kPa]))
                    [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
@@ -563,8 +569,8 @@
    (typical-total-pump-energy (rand-energy-unit)))
   ([energy-unit]
    (condp = energy-unit
-     :ft-lb [:ft-lb (tuc/draw-normal 4.340741e10 1.443922e10)]
-     :J     [:J (tuc/draw-normal 14670.972535 5275.739520)])))
+     :ft-lb [(tuc/draw-normal 4.340741e10 1.443922e10) :ft-lb]
+     :J     [(tuc/draw-normal 14670.972535 5275.739520) :J])))
 
 (defn typical-force
   ([] (typical-force (rand-force-unit)))
@@ -581,3 +587,12 @@
      (condp = force-unit
        :lbf [typical-force-lbf force-unit]
        :N   [((convert-units-f :lbf :N) typical-force-lbf) force-unit]))))
+
+(defn typical-power
+  ([] (typical-power (rand-power-unit)))
+  ([power-unit]
+   (let [typical-energy (first (typical-total-pump-energy :J))
+         typical-power  (condp = power-unit
+                          :W  typical-energy ;; Assume energy expended for 1 s
+                          :hp ((convert-units-f :W :hp) (first (typical-power :W))))]
+     [typical-power power-unit])))
