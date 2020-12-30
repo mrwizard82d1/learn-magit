@@ -546,7 +546,7 @@
                                     (is-density-unit density-unit-or-substance)
                                     [density-unit-or-substance (rand-nth substances)]
                                     (is-substance density-unit-or-substance)
-                                    [(rand-nth [:kg-per-m3 :lb-per-cu-ft]) density-unit-or-substance])]
+                                    [(rand-density-unit) density-unit-or-substance])]
      (typical-density density-unit substance)))
   ([density-unit substance]
    (condp = density-unit
@@ -596,3 +596,37 @@
                           :W  typical-energy ;; Assume energy expended for 1 s
                           :hp ((convert-units-f :W :hp) (first (typical-power :W))))]
      [typical-power power-unit])))
+
+
+(def measured-at-location [:downhole :surface])
+
+(defn typical-temperature
+  ([]
+   (let [temperature-unit (rand-temperature-unit)
+         measured-at      (rand-nth measured-at-location)]
+     (typical-temperature temperature-unit measured-at)))
+  ([unit-or-location]
+   (let [is-unit                        #{:C :F}
+         is-location                    (set measured-at-location)
+         [temperature-unit measured-at] (cond
+                                          (is-unit unit-or-location)
+                                          [unit-or-location (rand-nth measured-at-location)]
+                                          (is-location unit-or-location)
+                                          [(rand-temperature-unit) unit-or-location])]
+     (typical-temperature temperature-unit measured-at)))
+  ([temperature-unit measured-at]
+   (let [temperature-f-downhole (tuc/draw-normal 155.1 1.5)
+         temperature-f-surface  (rand-nth [(tuc/draw-normal 60 15)
+                                           (tuc/draw-normal 51 14)
+                                           (tuc/draw-normal 51 15)
+                                           (tuc/draw-normal 51 18)])
+         temperature-value      (condp = measured-at
+                                  :downhole
+                                  (condp = temperature-unit
+                                    :F temperature-f-downhole
+                                    :C ((convert-units-f :F :C) temperature-f-downhole))
+                                  :surface
+                                  (condp = temperature-unit
+                                    :F temperature-f-surface
+                                    :C ((convert-units-f :F :C) temperature-f-surface)))]
+     [temperature-value temperature-unit measured-at])))
