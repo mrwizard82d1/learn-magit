@@ -84,6 +84,7 @@
       [from-unit to-unit] [(* magnitude factor) to]
       [to-unit from-unit] [(/ magnitude factor) to])))
 
+(def density-as (as-f :lb-per-cu-ft :kg-per-m3 16.0185))
 (def force-as (as-f :lbf :N 4.44822))
 (def power-as (as-f :hp :W 745.69987158227022))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
@@ -657,4 +658,5 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:F :C} rand-temperature-unit typical-temperature temperature-as)
+(generate-pair #{:lb-per-cu-ft :kg-per-m3} rand-density-unit typical-density density-as)
+;; => [[0.01952863782737629 :lb-per-cu-ft :metal] [0.3128194850378271 :kg-per-m3]]
