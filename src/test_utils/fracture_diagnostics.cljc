@@ -87,6 +87,7 @@
 (defn density-as [[from-magnitude from-unit substance] to-unit]
   (let [[target-magnitude _] ((as-f :lb-per-cu-ft :kg-per-m3 16.0185) [from-magnitude from-unit] to-unit)]
     [target-magnitude to-unit substance]))
+(def energy-as (as-f :ft-lb :J 1.35582))
 (def force-as (as-f :lbf :N 4.44822))
 (def power-as (as-f :hp :W 745.69987158227022))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
@@ -660,4 +661,5 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:lb-per-cu-ft :kg-per-m3} rand-density-unit typical-density density-as)
+(generate-pair #{:ft-lb :J} rand-energy-unit typical-total-pump-energy energy-as)
+;; => [[7.045024884133696E10 :ft-lb] [9.551785638406148E10 :J]]
