@@ -102,6 +102,13 @@
       [:bpm :m3-per-min] [(* magnitude factor) to]
       [:m3-per-min :bpm] [(/ magnitude factor) to])))
 
+(defn temperature-as [[magnitude from] to]
+  (let [f->c #(/ (- % 32) 1.8)
+        c->f #(+ (* % 1.8) 32)]
+    (condp = [from to]
+      [:F :C] [(f->c magnitude) to]
+      [:C :F] [(c->f magnitude) to])))
+
 (defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
 
@@ -661,4 +668,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:bbl-per-min :m3-per-min} rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
+(generate-pair #{:F :C} rand-temperature-unit typical-temperature temperature-as)
