@@ -78,30 +78,19 @@
                    [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
     (converter [from to])))
 
-(defn force-as [[magnitude from] to]
-  (let [factor 4.44822]  ; pound-force -> Newton
+(defn as-f [from-unit to-unit factor]
+  (fn [[magnitude from] to]
     (condp = [from to]
-      [:lbf :N] [(* magnitude factor) to]
-      [:N :lbf] [(/ magnitude factor) to])))
+      [from-unit to-unit] [(* magnitude factor) to]
+      [to-unit from-unit] [(/ magnitude factor) to])))
 
-(defn power-as [[magnitude from] to]
-  (let [factor 745.69987158227022]  ; hp -> W
-    (condp = [from to]
-      [:hp :W] [(* magnitude factor) to]
-      [:W :hp] [(/ magnitude factor) to])))
+(def force-as (as-f :lbf :N 4.44822))
+(def power-as (as-f :hp :W 745.69987158227022))
+(def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
+(def slurry-rate-as (as-f :bpm :m3-per-min 6.28981077))
 
-(defn proppant-concentration-as [[magnitude from] to]
-  (let [factor 119.826]  ; lb-per-gal -> kg-per-cu-m
-    (condp = [from to]
-      [:lb-per-gal :kg-per-m3] [(* magnitude factor) to]
-      [:kg-per-m3 :lb-per-gal] [(/ magnitude factor) to])))
-
-(defn slurry-rate-as [[magnitude from] to]
-  (let [factor 6.28981077]  ; bbl -> m^3 (duration same for both)
-    (condp = [from to]
-      [:bpm :m3-per-min] [(* magnitude factor) to]
-      [:m3-per-min :bpm] [(/ magnitude factor) to])))
-
+;; Because conversion between temperature units is not simply multiplicative, I define this function with a
+;; unique body.
 (defn temperature-as [[magnitude from] to]
   (let [f->c #(/ (- % 32) 1.8)
         c->f #(+ (* % 1.8) 32)]
