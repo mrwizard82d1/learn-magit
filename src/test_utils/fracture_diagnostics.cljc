@@ -43,6 +43,12 @@
 (def rand-temperature-unit (rand-unit :temperature))
 (def rand-volume-unit (rand-unit :volume))
 
+(defn force-as [[magnitude from] to]
+  (let [factor 4.44822]
+    (condp = [from to]
+      [:lbf :N] [(* magnitude factor) to]
+      [:N :lbf] [(/ magnitude factor) to])))
+
 (defn convert-units-f [from to]
   (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
                    [:ft-lb :J]                1.35582
@@ -631,3 +637,8 @@
                                     :F temperature-f-surface
                                     :C ((convert-units-f :F :C) temperature-f-surface)))]
      [temperature-value temperature-unit measured-at])))
+
+(defn generate-pair [units generate-units-f generate-measurement-f measurement-as-f]
+  (let [unit        (generate-units-f)
+        measurement (generate-measurement-f unit)]
+    [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
