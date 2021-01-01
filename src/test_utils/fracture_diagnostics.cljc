@@ -25,8 +25,8 @@
                             :mass                   [:lb :kg]
                             :power                  [:hp :W]
                             :pressure               [:psi :kPa]
-                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3 :kg/m3]
-                            :slurry-rate            [:bbl-per-min :bpm :m3-per-min :m3/min]
+                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3]
+                            :slurry-rate            [:bpm :m3-per-min]
                             :volume                 [:bbl :m3]
                             :temperature            [:F :C]}]
     (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
@@ -42,12 +42,6 @@
 (def rand-slurry-rate-unit (rand-unit :slurry-rate))
 (def rand-temperature-unit (rand-unit :temperature))
 (def rand-volume-unit (rand-unit :volume))
-
-(defn force-as [[magnitude from] to]
-  (let [factor 4.44822]
-    (condp = [from to]
-      [:lbf :N] [(* magnitude factor) to]
-      [:N :lbf] [(/ magnitude factor) to])))
 
 (defn convert-units-f [from to]
   (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
@@ -76,13 +70,37 @@
                    [:kPa :psi]                #(/ % (factors [:psi :kPa]))
                    [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
                    [:kg-per-m3 :lb-per-gal]   #(/ % (factors [:lb-per-gal :kg-per-m3]))
-                   [:m3-per-min :bbl-per-min] #(* % (factors [:m3 :bbl]))
-                   [:bbl-per-min :m3-per-min] #(/ % (factors [:lb-per-gal :kg-per-m3]))
+                   [:m3-per-min :bpm]         #(* % (factors [:m3 :bbl]))
+                   [:bpm :m3-per-min]         #(/ % (factors [:bbl :m3]))
                    [:F :C]                    #(/ (- % 32) 1.8)
                    [:C :F]                    #(+ (* % 1.8) 32)
                    [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
                    [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
     (converter [from to])))
+
+(defn force-as [[magnitude from] to]
+  (let [factor 4.44822]  ; pound-force -> Newton
+    (condp = [from to]
+      [:lbf :N] [(* magnitude factor) to]
+      [:N :lbf] [(/ magnitude factor) to])))
+
+(defn power-as [[magnitude from] to]
+  (let [factor 745.69987158227022]  ; hp -> W
+    (condp = [from to]
+      [:hp :W] [(* magnitude factor) to]
+      [:W :hp] [(/ magnitude factor) to])))
+
+(defn proppant-concentration-as [[magnitude from] to]
+  (let [factor 119.826]  ; lb-per-gal -> kg-per-cu-m
+    (condp = [from to]
+      [:lb-per-gal :kg-per-m3] [(* magnitude factor) to]
+      [:kg-per-m3 :lb-per-gal] [(/ magnitude factor) to])))
+
+(defn slurry-rate-as [[magnitude from] to]
+  (let [factor 6.28981077]  ; bbl -> m^3 (duration same for both)
+    (condp = [from to]
+      [:bpm :m3-per-min] [(* magnitude factor) to]
+      [:m3-per-min :bpm] [(/ magnitude factor) to])))
 
 (defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
@@ -642,3 +660,5 @@
   (let [unit        (generate-units-f)
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
+
+(generate-pair #{:bbl-per-min :m3-per-min} rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
