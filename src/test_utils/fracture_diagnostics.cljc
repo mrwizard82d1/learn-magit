@@ -58,8 +58,8 @@
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
-                   [:lbf :W]                  #(* % (factors [:lbf :W]))
-                   [:W :lbf]                  #(/ % (factors [:lbf :W]))
+                   [:lbf :N]                  #(* % (factors [:lbf :N]))
+                   [:N :lbf]                  #(/ % (factors [:lbf :N]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
@@ -511,9 +511,10 @@
   ([] (let [volume-unit (rand-volume-unit)]
         [(typical-pumped-volume volume-unit) volume-unit]))
   ([volume-unit]
-   (condp = volume-unit
-     :bbl (tuc/draw-normal 6986.70 1992.30)
-     :m3 (tuc/draw-normal 813.47 286.89))))
+   (let [volume-magnitude (condp = volume-unit
+                            :bbl (tuc/draw-normal 6986.70 1992.30)
+                            :m3  (tuc/draw-normal 813.47 286.89))]
+     [volume-magnitude volume-unit])))
 
 (defn typical-proppant-mass
   ([] (let [mass-unit (rand-mass-unit)]
