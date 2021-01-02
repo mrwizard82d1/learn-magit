@@ -24,7 +24,7 @@
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
                             :power                  [:hp :W]
-                            :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3]
+                            :proppant-concentration [:lb-per-gal :kg-per-m3]
                             :slurry-rate            [:bpm :m3-per-min]
                             :volume                 [:bbl :m3]
                             :temperature            [:F :C]}]
@@ -450,8 +450,7 @@
    (let [unit (rand-proppant-concentration-unit)]
      (typical-proppant-concentration unit)))
   ([unit]
-   (let [typical-value (cond (or (= unit :lb-per-gal)
-                                 (= unit :lb/gal))
+   (let [typical-value (cond (= unit :lb-per-gal)
                              (value-from-typical-range 0.2 10)
                              (or (= unit :kg-per-m3)
                                  (= unit :kg/m3))
@@ -654,4 +653,11 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:hp :W} rand-power-unit typical-power power-as)
+;(generate-pair #{:lb-per-gal :kg-per-m3}
+;               rand-proppant-concentration-unit
+;               typical-proppant-concentration
+;               proppant-concentration-as)
+(repeatedly 10 (fn [] (generate-pair #{:lb-per-gal :kg-per-m3}
+                                     rand-proppant-concentration-unit
+                                     typical-proppant-concentration
+                                     proppant-concentration-as)))
