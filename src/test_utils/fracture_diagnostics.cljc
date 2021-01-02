@@ -452,8 +452,7 @@
   ([unit]
    (let [typical-value (cond (= unit :lb-per-gal)
                              (value-from-typical-range 0.2 10)
-                             (or (= unit :kg-per-m3)
-                                 (= unit :kg/m3))
+                             (= unit :kg-per-m3)
                              (let [conversion (/ 0.453592 0.00378541)]
                                 (value-from-typical-range (* 0.2 conversion) (* 10 conversion))))]
      [typical-value unit])))AbstractMethodError
