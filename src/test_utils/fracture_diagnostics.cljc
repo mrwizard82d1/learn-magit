@@ -608,7 +608,7 @@
          typical-casing-inner-diameter-inches (- typical-casing-outer-diameter-inches
                                                  typical-casing-pipe-witdth-inches)
          typical-casing-area-sq-inches        (* 2 Math/PI (/ typical-casing-inner-diameter-inches 2))
-         typical-pressure-psi                 (typical-surface-treating-pressure :psi)
+         typical-pressure-psi                 (magnitude (typical-surface-treating-pressure :psi))
          typical-force-lbf                    (* typical-pressure-psi typical-casing-area-sq-inches)]
      (condp = force-unit
        :lbf [typical-force-lbf force-unit]
