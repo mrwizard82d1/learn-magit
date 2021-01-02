@@ -426,8 +426,7 @@
    (let [unit (rand-slurry-rate-unit)]
      (typical-slurry-rate unit)))
   ([unit]
-   (let [typical-value (cond (or (= unit :bbl-per-min)
-                                 (= unit :bpm))
+   (let [typical-value (cond (= unit :bpm)
                              (value-from-typical-range 75 100)
                              (or (= unit :m3-per-min)
                                  (= unit :m3/min))
@@ -652,7 +651,7 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:lb-per-gal :kg-per-m3}
-               rand-proppant-concentration-unit
-               typical-proppant-concentration
-               proppant-concentration-as)
+(generate-pair #{:bpm :m3-per-min}
+               rand-slurry-rate-unit
+               typical-slurry-rate
+               slurry-rate-as)
