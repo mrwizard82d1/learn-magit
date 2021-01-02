@@ -45,7 +45,6 @@
 (defn convert-units-f [from to]
   (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
                    [:ft-lb :J]                1.35582
-                   [:lbf :N]                  4.44822
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
                    [:hp :W]                   745.69987158227022
@@ -56,8 +55,6 @@
                    [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
-                   [:lbf :N]                  #(* % (factors [:lbf :N]))
-                   [:N :lbf]                  #(/ % (factors [:lbf :N]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
@@ -611,8 +608,8 @@
          typical-pressure-psi                 (magnitude (typical-surface-treating-pressure :psi))
          typical-force-lbf                    (* typical-pressure-psi typical-casing-area-sq-inches)]
      (condp = force-unit
-       :lbf [typical-force-lbf force-unit]
-       :N   [((convert-units-f :lbf :N) typical-force-lbf) force-unit]))))
+       :lbf (make-measurement typical-force-lbf force-unit)
+       :N   (force-as (typical-force :lbf) :N)))))
 
 (defn typical-power
   ([] (typical-power (rand-power-unit)))
@@ -662,4 +659,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:psi :kPa} rand-pressure-unit typical-surface-treating-pressure pressure-as)
+(generate-pair #{:lbf :N} rand-force-unit typical-force force-as)
