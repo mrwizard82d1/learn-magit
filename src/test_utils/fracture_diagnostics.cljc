@@ -24,7 +24,6 @@
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
                             :power                  [:hp :W]
-                            :pressure               [:psi :kPa]
                             :proppant-concentration [:lb-per-gal :lb/gal :kg-per-m3]
                             :slurry-rate            [:bpm :m3-per-min]
                             :volume                 [:bbl :m3]
@@ -50,7 +49,6 @@
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
                    [:hp :W]                   745.69987158227022
-                   [:psi :kPa]                6.894757293168361
                    [:lb-per-gal :kg-per-m3]   119.826
                    ;; slurry rate conversion not needed (use [:bbl :m3])
                    [:m3 :bbl]                 6.28981077}
@@ -66,8 +64,6 @@
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
                    [:hp :W]                   #(* % (factors [:hp :W]))
                    [:W :hp]                   #(/ % (factors [:hp :W]))
-                   [:psi :kPa]                #(* % (factors [:psi :kPa]))
-                   [:kPa :psi]                #(/ % (factors [:psi :kPa]))
                    [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
                    [:kg-per-m3 :lb-per-gal]   #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:m3-per-min :bpm]         #(* % (factors [:m3 :bbl]))
@@ -81,8 +77,10 @@
 ;; I model a measurement as a 2- or 3-item vector. These functions make the intent of some code clearer when
 ;; manipulating measurements.
 (defn make-measurement
-  ([magnitude unit] [magnitude unit])
-  ([magnitude unit other] [magnitude unit other]))
+  ([magnitude unit]
+   {:pre [(not (nil? magnitude)) (not (nil? unit))]}
+   [magnitude unit])
+  ([magnitude unit other] (conj (make-measurement magnitude unit) other)))
 
 (def magnitude first)
 (def unit second)
@@ -423,7 +421,7 @@
    (let [pressure-magnitude (cond (= pressure-unit :psi) (first (p-mon-seq))
                                   (= pressure-unit :kPa)
                                   (magnitude (pressure-as (typical-monitor-pressure :psi) :kPa)))]
-     [pressure-magnitude pressure-unit])))
+     (make-measurement pressure-magnitude pressure-unit))))
 
 (defn typical-monitor-temperature
   ([] (let [units (rand-nth [:C :F])]
@@ -432,23 +430,6 @@
                  (value-from-typical-range 50 80)
                  (= units :F)
                  ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
-
-(defn typical-surface-treating-pressure
-  ([]
-   (let [units (rand-pressure-unit)]
-     [units (typical-surface-treating-pressure units)]))
-  ([units]
-   (cond (= units :psi)
-         (value-from-typical-range 5000 9000)
-         (= units :kPa)
-         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi)))))
-
-(defn surface-treating-pressure-seq [arg]
-  (cond (int? arg)
-        (let [unit (rand-pressure-unit)]
-          [unit (take arg (surface-treating-pressure-seq unit))])
-        (keyword? arg)
-        (repeatedly (fn [] (typical-surface-treating-pressure arg)))))
 
 (defn typical-slurry-rate
   ([]
@@ -554,14 +535,28 @@
      :lb (tuc/draw-normal 4962.77 1375.72)
      :kg (tuc/draw-normal 135068.05 16421.44))))
 
-(defn typical-median-pressure
+(defn typical-median-treating-pressure
   ([] (let [pressure-unit (rand-pressure-unit)]
-        [(typical-median-pressure pressure-unit) pressure-unit]))
+        (typical-median-treating-pressure pressure-unit)))
   ([pressure-unit]
-   (condp = pressure-unit
-     :psi (tuc/draw-normal 7569.89 663.65)
-     :kPa (tuc/draw-normal 64.1635 7.0987)
-     :MPa (/ (typical-median-pressure :kPa) 1000))))
+   (let [pressure-magnitude (condp = pressure-unit
+                              :psi (tuc/draw-normal 7569.89 663.65)
+                              :kPa (tuc/draw-normal 64.1635 7.0987))]
+     (make-measurement pressure-magnitude pressure-unit))))
+
+(defn typical-surface-treating-pressure
+  ([]
+   (let [pressure-unit (rand-pressure-unit)]
+     (typical-surface-treating-pressure pressure-unit)))
+  ([pressure-unit]
+   (typical-median-treating-pressure pressure-unit)))
+
+(defn surface-treating-pressure-seq [arg]
+  (cond (int? arg)
+        (let [unit (rand-pressure-unit)]
+          [unit (take arg (surface-treating-pressure-seq unit))])
+        (keyword? arg)
+        (map magnitude (repeatedly (fn [] (typical-surface-treating-pressure arg))))))
 
 (def substances [:gas :liquid :rock :metal])
 
@@ -667,5 +662,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:ft-lb :J} rand-energy-unit typical-total-pump-energy energy-as)
-;; => [[7.045024884133696E10 :ft-lb] [9.551785638406148E10 :J]]
+(generate-pair #{:psi :kPa} rand-pressure-unit typical-surface-treating-pressure pressure-as)
