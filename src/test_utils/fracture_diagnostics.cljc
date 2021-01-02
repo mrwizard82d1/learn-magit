@@ -2,7 +2,7 @@
   #?(:cljs (:require [test-utils.core :as tuc])
      :clj (:require (test-utils [core :as tuc]))))
 
-(def physical-quantities [:densty
+(def physical-quantities [:density
                           :energy
                           :force
                           :length
@@ -78,6 +78,16 @@
                    [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
     (converter [from to])))
 
+;; I model a measurement as a 2- or 3-item vector. These functions make the intent of some code clearer when
+;; manipulating measurements.
+(defn make-measurement
+  ([magnitude unit] [magnitude unit])
+  ([magnitude unit other] [magnitude unit other]))
+
+(def magnitude first)
+(def unit second)
+(def other last)
+
 (defn as-f [from-unit to-unit factor]
   (fn [[magnitude from] to]
     (condp = [from to]
@@ -90,6 +100,7 @@
 (def energy-as (as-f :ft-lb :J 1.35582))
 (def force-as (as-f :lbf :N 4.44822))
 (def power-as (as-f :hp :W 745.69987158227022))
+(def pressure-as (as-f :psi :kPa 6.894757293168361))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
 (def slurry-rate-as (as-f :bpm :m3-per-min 6.28981077))
 
@@ -407,15 +418,12 @@
     (tuc/draw-normal mean sigma)))
 
 (defn typical-monitor-pressure
-  ([units]
-   (cond (= units :psi)
-         (first (p-mon-seq))
-         (= units :kPa)
-         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
-         (= units :MPa)
-         ((convert-units-f :kPa :MPa) (typical-monitor-pressure :kPa))))
-  ([] (let [unit (rand-pressure-unit)]
-        [unit (typical-monitor-pressure unit)])))
+  ([] (typical-monitor-pressure (rand-pressure-unit)))
+  ([pressure-unit]
+   (let [pressure-magnitude (cond (= pressure-unit :psi) (first (p-mon-seq))
+                                  (= pressure-unit :kPa)
+                                  (magnitude (pressure-as (typical-monitor-pressure :psi) :kPa)))]
+     [pressure-magnitude pressure-unit])))
 
 (defn typical-monitor-temperature
   ([] (let [units (rand-nth [:C :F])]
@@ -433,9 +441,7 @@
    (cond (= units :psi)
          (value-from-typical-range 5000 9000)
          (= units :kPa)
-         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi))
-         (= units :MPa)
-         ((convert-units-f :kPa :MPa) (/ (typical-monitor-pressure :kPa) 1000)))))
+         ((convert-units-f :psi :kPa) (typical-monitor-pressure :psi)))))
 
 (defn surface-treating-pressure-seq [arg]
   (cond (int? arg)
