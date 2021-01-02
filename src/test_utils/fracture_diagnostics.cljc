@@ -47,7 +47,6 @@
                    [:ft-lb :J]                1.35582
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
-                   [:hp :W]                   745.69987158227022
                    [:lb-per-gal :kg-per-m3]   119.826
                    ;; slurry rate conversion not needed (use [:bbl :m3])
                    [:m3 :bbl]                 6.28981077}
@@ -59,8 +58,6 @@
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
-                   [:hp :W]                   #(* % (factors [:hp :W]))
-                   [:W :hp]                   #(/ % (factors [:hp :W]))
                    [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
                    [:kg-per-m3 :lb-per-gal]   #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:m3-per-min :bpm]         #(* % (factors [:m3 :bbl]))
@@ -614,12 +611,10 @@
 (defn typical-power
   ([] (typical-power (rand-power-unit)))
   ([power-unit]
-   (let [typical-energy (first (typical-total-pump-energy :J))
-         typical-power  (condp = power-unit
-                          :W  typical-energy ;; Assume energy expended for 1 s
-                          :hp ((convert-units-f :W :hp) (first (typical-power :W))))]
-     [typical-power power-unit])))
-
+   (let [typical-energy (first (typical-total-pump-energy :J))]
+     (condp = power-unit
+       :W (make-measurement typical-energy power-unit) ;; assume energy expended for 1 s
+       :hp (power-as (typical-power :W) :hp)))))
 
 (def measured-at-location [:downhole :surface])
 
@@ -659,4 +654,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:lbf :N} rand-force-unit typical-force force-as)
+(generate-pair #{:hp :W} rand-power-unit typical-power power-as)
