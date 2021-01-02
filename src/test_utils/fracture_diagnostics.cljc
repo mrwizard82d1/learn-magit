@@ -56,8 +56,6 @@
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
-                   [:F :C]                    #(/ (- % 32) 1.8)
-                   [:C :F]                    #(+ (* % 1.8) 32)
                    [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
                    [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
     (converter [from to])))
@@ -92,12 +90,15 @@
 
 ;; Because conversion between temperature units is not simply multiplicative, I define this function with a
 ;; unique body.
-(defn temperature-as [[magnitude from] to]
+(defn temperature-as [[magnitude from & location] to]
   (let [f->c #(/ (- % 32) 1.8)
-        c->f #(+ (* % 1.8) 32)]
-    (condp = [from to]
-      [:F :C] [(f->c magnitude) to]
-      [:C :F] [(c->f magnitude) to])))
+        c->f #(+ (* % 1.8) 32)
+        target-temperature (condp = [from to]
+                             [:F :C] (f->c magnitude)
+                             [:C :F] (c->f magnitude))]
+    (if location
+      (apply make-measurement target-temperature to location)
+      (make-measurement target-temperature to))))
 
 (defn typical-vertical-depth []
   (tuc/draw-normal 8000 1216))
@@ -411,13 +412,35 @@
                                   (magnitude (pressure-as (typical-monitor-pressure :psi) :kPa)))]
      (make-measurement pressure-magnitude pressure-unit))))
 
+(def measured-at-location [:downhole :surface])
+
 (defn typical-monitor-temperature
-  ([] (let [units (rand-nth [:C :F])]
-        (typical-monitor-temperature units)))
-  ([units] (cond (= units :C)
-                 (value-from-typical-range 50 80)
-                 (= units :F)
-                 ((convert-units-f :C :F) (typical-monitor-temperature :C)))))
+  ([]
+   (let [temperature-unit (rand-temperature-unit)
+         measured-at      (rand-nth measured-at-location)]
+     (typical-monitor-temperature temperature-unit measured-at)))
+  ([unit-or-location]
+   (let [is-unit                        #{:C :F}
+         is-location                    (set measured-at-location)
+         [temperature-unit measured-at] (cond
+                                          (is-unit unit-or-location)
+                                          [unit-or-location (rand-nth measured-at-location)]
+                                          (is-location unit-or-location)
+                                          [(rand-temperature-unit) unit-or-location])]
+     (typical-monitor-temperature temperature-unit measured-at)))
+  ([temperature-unit measured-at]
+   (let [temperature-f-downhole (tuc/draw-normal 155.1 1.5)
+         temperature-f-surface  (rand-nth [(tuc/draw-normal 60 15)
+                                           (tuc/draw-normal 51 14)
+                                           (tuc/draw-normal 51 15)
+                                           (tuc/draw-normal 51 18)])]
+     (condp = measured-at
+       :downhole (condp = temperature-unit
+                   :F (make-measurement temperature-f-downhole temperature-unit measured-at)
+                   :C (temperature-as (typical-monitor-temperature :F measured-at) :C))
+       :surface (condp = temperature-unit
+                  :F (make-measurement temperature-f-surface temperature-unit measured-at)
+                  :C (temperature-as (typical-monitor-temperature :F measured-at) :C))))))
 
 (defn typical-slurry-rate
   ([]
@@ -608,45 +631,9 @@
        :W (make-measurement typical-energy power-unit) ;; assume energy expended for 1 s
        :hp (power-as (typical-power :W) :hp)))))
 
-(def measured-at-location [:downhole :surface])
-
-(defn typical-temperature
-  ([]
-   (let [temperature-unit (rand-temperature-unit)
-         measured-at      (rand-nth measured-at-location)]
-     (typical-temperature temperature-unit measured-at)))
-  ([unit-or-location]
-   (let [is-unit                        #{:C :F}
-         is-location                    (set measured-at-location)
-         [temperature-unit measured-at] (cond
-                                          (is-unit unit-or-location)
-                                          [unit-or-location (rand-nth measured-at-location)]
-                                          (is-location unit-or-location)
-                                          [(rand-temperature-unit) unit-or-location])]
-     (typical-temperature temperature-unit measured-at)))
-  ([temperature-unit measured-at]
-   (let [temperature-f-downhole (tuc/draw-normal 155.1 1.5)
-         temperature-f-surface  (rand-nth [(tuc/draw-normal 60 15)
-                                           (tuc/draw-normal 51 14)
-                                           (tuc/draw-normal 51 15)
-                                           (tuc/draw-normal 51 18)])
-         temperature-value      (condp = measured-at
-                                  :downhole
-                                  (condp = temperature-unit
-                                    :F temperature-f-downhole
-                                    :C ((convert-units-f :F :C) temperature-f-downhole))
-                                  :surface
-                                  (condp = temperature-unit
-                                    :F temperature-f-surface
-                                    :C ((convert-units-f :F :C) temperature-f-surface)))]
-     [temperature-value temperature-unit measured-at])))
-
 (defn generate-pair [units generate-units-f generate-measurement-f measurement-as-f]
   (let [unit        (generate-units-f)
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:bpm :m3-per-min}
-               rand-slurry-rate-unit
-               typical-slurry-rate
-               slurry-rate-as)
+(generate-pair #{:F :C} rand-temperature-unit typical-monitor-temperature temperature-as)
