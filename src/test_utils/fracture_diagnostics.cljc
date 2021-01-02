@@ -24,7 +24,6 @@
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
                             :power                  [:hp :W]
-                            :proppant-concentration [:lb-per-gal :kg-per-m3]
                             :slurry-rate            [:bpm :m3-per-min]
                             :volume                 [:bbl :m3]
                             :temperature            [:F :C]}]
@@ -47,7 +46,6 @@
                    [:ft-lb :J]                1.35582
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
-                   [:lb-per-gal :kg-per-m3]   119.826
                    ;; slurry rate conversion not needed (use [:bbl :m3])
                    [:m3 :bbl]                 6.28981077}
         converter {[:lb-per-cu-ft :kg-per-m3] #(* % (factors [:lb-per-cu-ft :kg-per-m3]))
@@ -58,8 +56,6 @@
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
-                   [:lb-per-gal :kg-per-m3]   #(* % (factors [:lb-per-gal :kg-per-m3]))
-                   [:kg-per-m3 :lb-per-gal]   #(/ % (factors [:lb-per-gal :kg-per-m3]))
                    [:m3-per-min :bpm]         #(* % (factors [:m3 :bbl]))
                    [:bpm :m3-per-min]         #(/ % (factors [:bbl :m3]))
                    [:F :C]                    #(/ (- % 32) 1.8)
@@ -447,22 +443,26 @@
 
 (defn typical-proppant-concentration
   ([]
-   (let [unit (rand-proppant-concentration-unit)]
-     (typical-proppant-concentration unit)))
-  ([unit]
-   (let [typical-value (cond (= unit :lb-per-gal)
-                             (value-from-typical-range 0.2 10)
-                             (= unit :kg-per-m3)
-                             (let [conversion (/ 0.453592 0.00378541)]
-                                (value-from-typical-range (* 0.2 conversion) (* 10 conversion))))]
-     [typical-value unit])))AbstractMethodError
+   (let [proppant-concentration-unit (rand-proppant-concentration-unit)]
+     (typical-proppant-concentration proppant-concentration-unit)))
+  ([proppant-concentration-unit]
+   (let [maker (fn [proppant-concentration-magnitude]
+                 (make-measurement proppant-concentration-magnitude
+                                   proppant-concentration-unit))
+         converter (fn [proppant-concentration-magnitude]
+                     (proppant-concentration-as proppant-concentration-magnitude
+                                                proppant-concentration-unit))]
+     (condp = proppant-concentration-unit
+       :lb-per-gal (maker (value-from-typical-range 0.2 10))
+       :kg-per-m3 (converter (typical-proppant-concentration :lb-per-gal))))))
+
 
 (defn proppant-concentration-seq [arg]
   (cond (int? arg)
-        (let [unit (rand-proppant-concentration-unit)]
-          [unit (take arg (proppant-concentration-seq unit))])
+        (let [proppant-concentration-unit (rand-proppant-concentration-unit)]
+          [proppant-concentration-unit (take arg (proppant-concentration-seq proppant-concentration-unit))])
         (keyword? arg)
-        (repeatedly (fn [] (typical-proppant-concentration arg)))))
+        (map magnitude (repeatedly (fn [] (typical-proppant-concentration arg))))))
 
 (defn rand-uwi []
   (apply str
@@ -652,11 +652,7 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-;(generate-pair #{:lb-per-gal :kg-per-m3}
-;               rand-proppant-concentration-unit
-;               typical-proppant-concentration
-;               proppant-concentration-as)
-(repeatedly 10 (fn [] (generate-pair #{:lb-per-gal :kg-per-m3}
-                                     rand-proppant-concentration-unit
-                                     typical-proppant-concentration
-                                     proppant-concentration-as)))
+(generate-pair #{:lb-per-gal :kg-per-m3}
+               rand-proppant-concentration-unit
+               typical-proppant-concentration
+               proppant-concentration-as)
