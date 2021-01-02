@@ -56,8 +56,6 @@
                    [:m :ft]                   #(* % (factors [:m :ft]))
                    [:kg :lb]                  #(* % (factors [:kg :lb]))
                    [:lb :kg]                  #(/ % (factors [:kg :lb]))
-                   [:m3-per-min :bpm]         #(* % (factors [:m3 :bbl]))
-                   [:bpm :m3-per-min]         #(/ % (factors [:bbl :m3]))
                    [:F :C]                    #(/ (- % 32) 1.8)
                    [:C :F]                    #(+ (* % 1.8) 32)
                    [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
@@ -423,15 +421,12 @@
 
 (defn typical-slurry-rate
   ([]
-   (let [unit (rand-slurry-rate-unit)]
-     (typical-slurry-rate unit)))
-  ([unit]
-   (let [typical-value (cond (= unit :bpm)
-                             (value-from-typical-range 75 100)
-                             (or (= unit :m3-per-min)
-                                 (= unit :m3/min))
-                             (value-from-typical-range 11.92 15.9))]
-     [typical-value unit])))
+   (let [slurry-rate-unit (rand-slurry-rate-unit)]
+     (typical-slurry-rate slurry-rate-unit)))
+  ([slurry-rate-unit]
+   (condp = slurry-rate-unit
+     :bpm (make-measurement (value-from-typical-range 75 100) :bpm)
+     :m3-per-min (slurry-rate-as (typical-slurry-rate :bpm) :m3-per-min))))
 
 (defn slurry-rate-seq [arg]
   (cond (int? arg)
