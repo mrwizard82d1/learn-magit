@@ -33,21 +33,17 @@
 (defn rand-unit [physical-quantity]
   (rand-nth (get quantity-unit-map physical-quantity)))
 
-(repeatedly 25 (fn [] (let [physical-quantity (rand-physical-quantity)]
-                        [physical-quantity (rand-unit physical-quantity)])))
-
-
-(def rand-density-unit (rand-unit :density))
-(def rand-energy-unit (rand-unit :energy))
-(def rand-force-unit (rand-unit :force))
-(def rand-length-unit (rand-unit :length))
-(def rand-mass-unit (rand-unit :mass))
-(def rand-power-unit (rand-unit :power))
-(def rand-pressure-unit (rand-unit :pressure))
-(def rand-proppant-concentration-unit (rand-unit :proppant-concentration))
-(def rand-slurry-rate-unit (rand-unit :slurry-rate))
-(def rand-temperature-unit (rand-unit :temperature))
-(def rand-volume-unit (rand-unit :volume))
+(def rand-density-unit (fn []  (rand-unit :density)))
+(def rand-energy-unit (fn [] (rand-unit :energy)))
+(def rand-force-unit (fn [] (rand-unit :force)))
+(def rand-length-unit (fn [] (rand-unit :length)))
+(def rand-mass-unit (fn [] (rand-unit :mass)))
+(def rand-power-unit (fn [] (rand-unit :power)))
+(def rand-pressure-unit (fn [] (rand-unit :pressure)))
+(def rand-proppant-concentration-unit (fn [] (rand-unit :proppant-concentration)))
+(def rand-slurry-rate-unit (fn [] (rand-unit :slurry-rate)))
+(def rand-temperature-unit (fn [] (rand-unit :temperature)))
+(def rand-volume-unit (fn [] (rand-unit :volume)))
 
 (defn convert-units-f [from to]
   (let [factors   {[:ft-lb :J]                1.35582
@@ -636,7 +632,7 @@
        :hp (power-as (typical-power :W) :hp)))))
 
 (defn generate-measurement-pair [units generate-units-f generate-measurement-f measurement-as-f]
-  (let [unit        (generate-units-f)
+  (let [unit (generate-units-f)
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
