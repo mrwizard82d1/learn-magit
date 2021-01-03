@@ -540,11 +540,12 @@
 
 (defn typical-proppant-mass
   ([] (let [mass-unit (rand-mass-unit)]
-        [(typical-proppant-mass mass-unit) mass-unit]))
+        (typical-proppant-mass mass-unit)))
   ([mass-unit]
-   (condp = mass-unit
-     :lb (tuc/draw-normal 4962.77 1375.72)
-     :kg (tuc/draw-normal 135068.05 16421.44))))
+   (let [mass-measurement (condp = mass-unit
+                            :lb (tuc/draw-normal 4962.77 1375.72)
+                            :kg (tuc/draw-normal 135068.05 16421.44))]
+     (make-measurement mass-measurement mass-unit))))
 
 (defn typical-median-treating-pressure
   ([] (let [pressure-unit (rand-pressure-unit)]
@@ -659,8 +660,3 @@
    ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
 
 (rand-measurement)
-
-
-
-(rand-measurement)
-
