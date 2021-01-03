@@ -17,18 +17,25 @@
 (defn rand-physical-quantity []
   (rand-nth physical-quantities))
 
+(def quantity-unit-map {:density                [:lb-per-cu-ft :kg-per-m3]
+                        :energy                 [:ft-lb :J]
+                        :force                  [:lbf :N]
+                        :length                 [:ft :m]
+                        :mass                   [:lb :kg]
+                        :power                  [:hp :W]
+                        :pressure               [:psi :kPa]
+                        :proppant-concentration [:lb-per-gal :kg-per-m3]
+                        :temperature            [:F :C]
+                        :slurry-rate            [:bpm :m3-per-min]
+                        :volume                 [:bbl :m3]})
+
+
 (defn rand-unit [physical-quantity]
-  (let [quantity-units-map {:density                [:lb-per-cu-ft :kg-per-m3]
-                            :energy                 [:ft-lb :J]
-                            :force                  [:lbf :N]
-                            :length                 [:ft :m]
-                            :mass                   [:lb :kg]
-                            :power                  [:hp :W]
-                            :proppant-concentration [:lb-per-gal :kg-per-m3]
-                            :slurry-rate            [:bpm :m3-per-min]
-                            :volume                 [:bbl :m3]
-                            :temperature            [:F :C]}]
-    (fn [] (rand-nth (get quantity-units-map physical-quantity)))))
+  (rand-nth (get quantity-unit-map physical-quantity)))
+
+(repeatedly 25 (fn [] (let [physical-quantity (rand-physical-quantity)]
+                        [physical-quantity (rand-unit physical-quantity)])))
+
 
 (def rand-density-unit (rand-unit :density))
 (def rand-energy-unit (rand-unit :energy))
@@ -85,7 +92,7 @@
 (def power-as (as-f :hp :W 745.69987158227022))
 (def pressure-as (as-f :psi :kPa 6.894757293168361))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
-(def slurry-rate-as (as-f :bpm :m3-per-min 6.28981077))
+(def slurry-rate-as (as-f :m3-per-min :bpm 6.28981077))
 
 ;; Because conversion between temperature units is not simply multiplicative, I define this function with a
 ;; unique body.
@@ -633,4 +640,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair #{:lb-per-cu-ft :kg-per-m3} rand-density-unit typical-density density-as)
+(generate-measurement-pair #{:bpm :m3-per-min} rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
