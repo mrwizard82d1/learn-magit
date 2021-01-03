@@ -53,14 +53,11 @@
 
 (defn convert-units-f [from to]
   (let [factors   {[:ft-lb :J]                1.35582
-                   [:kg :lb]                  2.20462262185
                    ;; slurry rate conversion not needed (use [:bbl :m3])
                    [:m3 :bbl]                 6.28981077}
         converter {[:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
-                   [:kg :lb]                  #(* % (factors [:kg :lb]))
-                   [:lb :kg]                  #(/ % (factors [:kg :lb]))
                    [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
                    [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
     (converter [from to])))
@@ -89,6 +86,7 @@
 (def energy-as (as-f :ft-lb :J 1.35582))
 (def force-as (as-f :lbf :N 4.44822))
 (def length-as (as-f :m :ft 3.28084))
+(def mass-as (as-f :kg :lb 2.20462262185))
 (def power-as (as-f :hp :W 745.69987158227022))
 (def pressure-as (as-f :psi :kPa 6.894757293168361))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
@@ -656,8 +654,8 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair (set (quantity-unit-map :length))
-                           rand-length-unit typical-stage-length length-as)
+(generate-measurement-pair (set (quantity-unit-map :mass))
+                           rand-mass-unit typical-proppant-mass mass-as)
 
 (defn rand-measurement
   ([]
