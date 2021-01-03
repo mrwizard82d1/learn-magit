@@ -667,7 +667,7 @@
   ([physical-quantity]
    ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
 
-((quantity-generate-measurement-map :angle))
-((quantity-generate-measurement-map :angle) (rand-unit :angle))
-(rand-measurement :angle)
-(generate-measurement-pair #{:deg} (fn [] :deg) (fn [] (typical-azimuth (rand-nth 360))) identity)
+((quantity-generate-measurement-map :duration))
+((quantity-generate-measurement-map :duration) (rand-unit :duration))
+(rand-measurement :duration)
+(generate-measurement-pair #{:deg} (fn [] :deg) (fn [] (typical-azimuth (rand-nth (range 360)))) identity)
