@@ -650,7 +650,8 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair #{:bpm :m3-per-min} rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
+(generate-measurement-pair (set (quantity-unit-map :slurry-rate))
+                           rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
 
 (defn rand-measurement
   ([]
