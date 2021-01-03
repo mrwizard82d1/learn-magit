@@ -43,14 +43,12 @@
 (def rand-volume-unit (rand-unit :volume))
 
 (defn convert-units-f [from to]
-  (let [factors   {[:lb-per-cu-ft :kg-per-m3] 16.0185
-                   [:ft-lb :J]                1.35582
+  (let [factors   {[:ft-lb :J]                1.35582
                    [:m :ft]                   3.28084
                    [:kg :lb]                  2.20462262185
                    ;; slurry rate conversion not needed (use [:bbl :m3])
                    [:m3 :bbl]                 6.28981077}
-        converter {[:lb-per-cu-ft :kg-per-m3] #(* % (factors [:lb-per-cu-ft :kg-per-m3]))
-                   [:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
+        converter {[:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
                    [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
                    [:ft :m]                   #(/ % (factors [:m :ft]))
@@ -586,19 +584,17 @@
      (typical-density density-unit substance)))
   ([density-unit substance]
    (condp = density-unit
-     :lb-per-cu-ft (let [[density _ substance] (typical-density :kg-per-m3)]
-                     [((convert-units-f :kg-per-m3 :lb-per-cu-ft) density) :lb-per-cu-ft substance])
-     :kg-per-m3    (condp = substance
-                     ;; Typical values for different substances taken from
-                     ;; https://serc.carleton.edu/mathyouneed/density/index.html#:~:text=Typical%20densities%20for%20gasses%20are,or%207%20g%2Fcm3.
-                     ;; accessed on 23-Dec-2020. Additionally, the data for metals was taken from
-                     ;; https://theengineeringmindset.com/density-of-metals/ accessed on 23-Dec-2020.
-                     (let [density (condp = substance
-                                     :gas    (tuc/draw-normal 1 0.11)
-                                     :liquid (tuc/draw-normal 1000 110)
-                                     :rock   (tuc/draw-normal 3000 330)
-                                     :metal  (tuc/draw-normal) 10355 5431)]
-                       [density density-unit substance])))))
+     :lb-per-cu-ft (density-as (typical-density :kg-per-m3 substance) :lb-per-cu-ft)
+     :kg-per-m3 (let [density (condp = substance
+                                ;; Typical values for different substances taken from
+                                ;; https://serc.carleton.edu/mathyouneed/density/index.html#:~:text=Typical%20densities%20for%20gasses%20are,or%207%20g%2Fcm3.
+                                ;; accessed on 23-Dec-2020. Additionally, the data for metals was taken from
+                                ;; https://theengineeringmindset.com/density-of-metals/ accessed on 23-Dec-2020.
+                                :gas    (tuc/draw-normal 1 0.11)
+                                :liquid (tuc/draw-normal 1000 110)
+                                :rock   (tuc/draw-normal 3000 330)
+                                :metal  (tuc/draw-normal) 10355 5431)]
+                  (make-measurement density density-unit substance)))))
 
 (defn typical-total-pump-energy
   ([]
@@ -614,12 +610,12 @@
    ;; Retrieved from http://www.excoresources.com/appalachia/ and
    ;; https://en.wikipedia.org/wiki/Casing_string on 28-Dec-2020.
    (let [typical-casing-outer-diameter-inches (+ 5 (/ 1 2))
-         typical-casing-pipe-witdth-inches    0.545
+         typical-casing-pipe-width-inches 0.545
          typical-casing-inner-diameter-inches (- typical-casing-outer-diameter-inches
-                                                 typical-casing-pipe-witdth-inches)
-         typical-casing-area-sq-inches        (* 2 Math/PI (/ typical-casing-inner-diameter-inches 2))
-         typical-pressure-psi                 (magnitude (typical-surface-treating-pressure :psi))
-         typical-force-lbf                    (* typical-pressure-psi typical-casing-area-sq-inches)]
+                                                 typical-casing-pipe-width-inches)
+         typical-casing-area-sq-inches (* 2 Math/PI (/ typical-casing-inner-diameter-inches 2))
+         typical-pressure-psi (magnitude (typical-surface-treating-pressure :psi))
+         typical-force-lbf (* typical-pressure-psi typical-casing-area-sq-inches)]
      (condp = force-unit
        :lbf (make-measurement typical-force-lbf force-unit)
        :N   (force-as (typical-force :lbf) :N)))))
@@ -637,7 +633,4 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair #{:lb-per-gal :kg-per-m3}
-                           rand-proppant-concentration-unit
-                           typical-proppant-concentration
-                           proppant-concentration-as)
+(generate-measurement-pair #{:lb-per-cu-ft :kg-per-m3} rand-density-unit typical-density density-as)
