@@ -2,7 +2,9 @@
   #?(:cljs (:require [test-utils.core :as tuc])
      :clj (:require (test-utils [core :as tuc]))))
 
-(def physical-quantities [:density
+(def physical-quantities [:angle
+                          :duration
+                          :density
                           :energy
                           :force
                           :length
@@ -17,7 +19,9 @@
 (defn rand-physical-quantity []
   (rand-nth physical-quantities))
 
-(def quantity-unit-map {:density                [:lb-per-cu-ft :kg-per-m3]
+(def quantity-unit-map {:angle                  [:deg]
+                        :duration               [:min]
+                        :density                [:lb-per-cu-ft :kg-per-m3]
                         :energy                 [:ft-lb :J]
                         :force                  [:lbf :N]
                         :length                 [:ft :m]
@@ -33,6 +37,8 @@
 (defn rand-unit [physical-quantity]
   (rand-nth (get quantity-unit-map physical-quantity)))
 
+(def rand-angle-unit :deg)
+(def rand-duration-unit :min)
 (def rand-density-unit (fn []  (rand-unit :density)))
 (def rand-energy-unit (fn [] (rand-unit :energy)))
 (def rand-force-unit (fn [] (rand-unit :force)))
@@ -241,7 +247,7 @@
   (tuc/draw-normal 92.2 2.4))
 
 (defn typical-azimuth [plot-angle]
-  (tuc/draw-normal plot-angle 1.24))
+  (make-measurement (tuc/draw-normal plot-angle 1.24) :deg))
 
 (defn make-line-generator [[m b]]
   (fn [t]
@@ -633,7 +639,9 @@
        :hp (power-as (typical-power :W) :hp)))))
 
 (def quantity-generate-measurement-map
-  {:density                typical-density
+  {:angle                  (fn [& _] (typical-azimuth (rand-nth (range 360))))
+   :duration               (fn [& _] (make-measurement (rand-nth (range 60)) :min))
+   :density                typical-density
    :energy                 typical-total-pump-energy
    :force                  typical-force
    :length                 typical-stage-length
@@ -650,14 +658,16 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair (set (quantity-unit-map :slurry-rate))
-                           rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
+(generate-measurement-pair (set (quantity-unit-map :density))
+                           rand-density-unit typical-density density-as)
 
 (defn rand-measurement
   ([]
    (rand-measurement (rand-physical-quantity)))
   ([physical-quantity]
-   (println physical-quantity)
    ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
 
-(rand-measurement)
+((quantity-generate-measurement-map :angle))
+((quantity-generate-measurement-map :angle) (rand-unit :angle))
+(rand-measurement :angle)
+(generate-measurement-pair #{:deg} (fn [] :deg) (fn [] (typical-azimuth (rand-nth 360))) identity)
