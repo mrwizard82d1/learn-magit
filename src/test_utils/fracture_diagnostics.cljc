@@ -52,14 +52,10 @@
 (def rand-volume-unit (fn [] (rand-unit :volume)))
 
 (defn convert-units-f [from to]
-  (let [factors   {[:ft-lb :J]                1.35582
-                   ;; slurry rate conversion not needed (use [:bbl :m3])
-                   [:m3 :bbl]                 6.28981077}
+  (let [factors   {[:ft-lb :J]                1.35582}
         converter {[:kg-per-m3 :lb-per-cu-ft] #(/ % (factors [:lb-per-cu-ft :kg-per-m3]))
                    [:ft-lb :J]                #(* % (factors [:ft-lb :J]))
-                   [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))
-                   [:bbl :m3]                 #(/ % (factors [:m3 :bbl]))
-                   [:m3 :bbl]                 #(* % (factors [:m3 :bbl]))}]
+                   [:J :ft-lb]                #(/ % (factors [:ft-lb :J]))}]
     (converter [from to])))
 
 ;; I model a measurement as a 2- or 3-item vector. These functions make the intent of some code clearer when
@@ -91,6 +87,7 @@
 (def pressure-as (as-f :psi :kPa 6.894757293168361))
 (def proppant-concentration-as (as-f :lb-per-gal :kg-per-m3 119.826))
 (def slurry-rate-as (as-f :m3-per-min :bpm 6.28981077))
+(def volume-as (as-f :m3 :bbl 6.28981077))
 
 ;; Because conversion between temperature units is not simply multiplicative, I define this function with a
 ;; unique body.
@@ -654,8 +651,8 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair (set (quantity-unit-map :mass))
-                           rand-mass-unit typical-proppant-mass mass-as)
+(generate-measurement-pair (set (quantity-unit-map :volume))
+                           rand-volume-unit typical-pumped-volume volume-as)
 
 (defn rand-measurement
   ([]
