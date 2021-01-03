@@ -24,6 +24,7 @@
                             :length                 [:ft :m]
                             :mass                   [:lb :kg]
                             :power                  [:hp :W]
+                            :proppant-concentration [:lb-per-gal :kg-per-m3]
                             :slurry-rate            [:bpm :m3-per-min]
                             :volume                 [:bbl :m3]
                             :temperature            [:F :C]}]
@@ -631,9 +632,12 @@
        :W (make-measurement typical-energy power-unit) ;; assume energy expended for 1 s
        :hp (power-as (typical-power :W) :hp)))))
 
-(defn generate-pair [units generate-units-f generate-measurement-f measurement-as-f]
+(defn generate-measurement-pair [units generate-units-f generate-measurement-f measurement-as-f]
   (let [unit        (generate-units-f)
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-pair #{:F :C} rand-temperature-unit typical-monitor-temperature temperature-as)
+(generate-measurement-pair #{:lb-per-gal :kg-per-m3}
+                           rand-proppant-concentration-unit
+                           typical-proppant-concentration
+                           proppant-concentration-as)
