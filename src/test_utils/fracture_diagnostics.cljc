@@ -631,9 +631,36 @@
        :W (make-measurement typical-energy power-unit) ;; assume energy expended for 1 s
        :hp (power-as (typical-power :W) :hp)))))
 
+(def quantity-generate-measurement-map
+  {:density                typical-density
+   :energy                 typical-total-pump-energy
+   :force                  typical-force
+   :length                 typical-stage-length
+   :mass                   typical-proppant-mass
+   :power                  typical-power
+   :pressure               typical-surface-treating-pressure
+   :proppant-concentration typical-proppant-concentration
+   :temperature            typical-monitor-temperature
+   :slurry-rate            typical-slurry-rate
+   :volume                 typical-pumped-volume})
+
 (defn generate-measurement-pair [units generate-units-f generate-measurement-f measurement-as-f]
   (let [unit (generate-units-f)
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
 (generate-measurement-pair #{:bpm :m3-per-min} rand-slurry-rate-unit typical-slurry-rate slurry-rate-as)
+
+(defn rand-measurement
+  ([]
+   (rand-measurement (rand-physical-quantity)))
+  ([physical-quantity]
+   (println physical-quantity)
+   ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
+
+(rand-measurement)
+
+
+
+(rand-measurement)
+
