@@ -520,11 +520,15 @@
        typical-location-in-ft
        (vec (map #(length-as % :m) typical-location-in-ft))))))
 
+(def well-reference-frames-xy [:project :well-head :absolute-state-plane])
+
 (defn rand-well-reference-frame-xy []
-  (rand-nth [:project :well-head :absolute-state-plane]))
+  (rand-nth well-reference-frames-xy))
+
+(def depth-datums [:ground-level :kelly-bushing :sea-level])
 
 (defn rand-depth-datum []
-  (rand-nth [:ground-level :kelly-bushing :sea-level]))
+  (rand-nth depth-datums))
 
 (defn typical-kelly-bushing-elevation []
   (tuc/draw-normal 30.48 (/ 1.00 3.00)))
