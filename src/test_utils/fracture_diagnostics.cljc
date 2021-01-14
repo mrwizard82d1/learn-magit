@@ -514,10 +514,11 @@
 (defn typical-subsurface-location
   ([] (typical-subsurface-location (rand-length-unit)))
   ([length-unit]
-   (let [typical-location-in-ft [(rand-easting) (rand-northing) (typical-vertical-depth)]]
+   (let [typical-location-in-ft (vec (map #(make-measurement % :ft)
+                                          [(rand-easting) (rand-northing) (typical-vertical-depth)]))]
      (if (= length-unit :ft)
-       [:ft typical-location-in-ft]
-       [:m (vec (map (convert-units-f :ft :m) typical-location-in-ft))]))))
+       typical-location-in-ft
+       (vec (map #(length-as % :m) typical-location-in-ft))))))
 
 (defn rand-well-reference-frame-xy []
   (rand-nth [:project :well-head :absolute-state-plane]))
