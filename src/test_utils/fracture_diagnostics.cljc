@@ -604,6 +604,12 @@
                                 :metal  (tuc/draw-normal) 10355 5431)]
                   (make-measurement density density-unit substance)))))
 
+(defn typical-fluid-density
+  ([]
+   (typical-density :liquid))
+  ([density-unit]
+   (typical-density :liquid density-unit)))
+
 (defn typical-total-pump-energy
   ([]
    (typical-total-pump-energy (rand-energy-unit)))
