@@ -608,7 +608,7 @@
   ([]
    (typical-density :liquid))
   ([density-unit]
-   (typical-density :liquid density-unit)))
+   (typical-density density-unit :liquid)))
 
 (defn typical-total-pump-energy
   ([]
