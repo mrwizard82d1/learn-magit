@@ -111,8 +111,12 @@
 (defn typical-toe-measured-depth []
   (tuc/draw-normal 18000 1500))
 
-(defn typical-stage-top []
-  (tuc/draw-normal 13750 2150))
+(defn typical-stage-top
+  ([] (typical-stage-top (rand-length-unit)))
+  ([length-unit]
+   (condp = length-unit
+     :ft (make-measurement (tuc/draw-normal 13750 2150) :ft)
+     :m (length-as (typical-stage-top :ft) :m))))
 
 (defn typical-stage-length
   ([] (typical-stage-length (rand-length-unit)))
