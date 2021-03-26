@@ -1,6 +1,9 @@
 (ns test-utils.fracture-diagnostics
   #?(:cljs (:require [test-utils.core :as tuc])
-     :clj (:require (test-utils [core :as tuc]))))
+     :clj (:require (test-utils [core :as tuc])))
+  ;; The following import fails in ClojureScript, but I am not ready to investigate js-joda/core. Similarly,
+  ;; all uses of `java.time.LocalDateTime` will fail in ClojureScript.
+  (:import (java.time LocalDateTime LocalTime)))
 
 (def physical-quantities [:angle
                           :duration
@@ -180,36 +183,28 @@
                      (tuc/draw-normal z 4)]))]
     (iterate next-fn [md x y z])))
 
+(defn add-duration [[^int year ^int month ^int day ^int hour ^int min ^int sec] duration-hours]
+  (let [local-start (java.time.LocalDateTime/of year month day hour min sec)
+        local-time (java.time.LocalTime/ofNanoOfDay (long (* 3600 1e9 duration-hours)))
+        local-sum (-> local-start
+                      (.plusNanos (.getNano local-time))
+                      (.plusSeconds (.getSecond local-time))
+                      (.plusMinutes (.getMinute local-time))
+                      (.plusHours (.getHour local-time)))]
+    [(.getYear local-sum) (.getMonthValue local-sum) (.getDayOfMonth local-sum)
+     (.getHour local-sum) (.getMinute local-sum) (.getSecond local-sum)
+     (.getNano local-sum)]))
+
 (defn typical-treatment-time-range
   ([]
-   (let [[year-0 month-0 day-0 hour-0 minute-0 second-0 :as start] (tuc/rand-timestamp 2016 2026)
-         duration-hours (tuc/draw-normal 2.52 0.17)
-         duration-hour (int duration-hours)
-         duration-minute (int (* 60 (- duration-hours duration-hour)))
-         duration-seconds (rand-nth (range 60))]
-    [start
-     [year-0 month-0 day-0
-      (rem (+ hour-0 duration-hour) 24)
-      (rem (+ minute-0 duration-minute) 60)
-      duration-seconds]]))
-  ([[start-a start-mo start-d start-h start-min start-s]
-    [stop-a stop-mo stop-d stop-h stop-min stop-s]]
+   (let [start (tuc/rand-timestamp 2018 2028)
+         duration-hours (tuc/draw-normal 2.52 0.17)]
+    [start (add-duration start duration-hours)]))
+  ([start-0  stop-0]
    (let [start-duration (tuc/draw-normal 5.7 1.37)
-         start-duration-h (int start-duration)
-         start-duration-min (int (* 60 (- start-duration start-duration-h)))
-         start-duration-s (rand-nth (range 60))
-         start [start-a start-mo start-d
-                (rem (+ start-h start-duration-h) 24)
-                (rem (+ start-min start-duration-min) 60)
-                start-duration-h]
-         stop-duration (tuc/draw-normal 2.52 0.17)
-         stop-duration-h (int stop-duration)
-         stop-duration-min (int (* 60 (- stop-duration stop-duration-h)))
-         stop-duration-s (rand-nth (range 60))
-         stop [start-a start-mo start-d
-               (rem (+ (nth start 3) stop-duration-h) 24)
-               (rem (+ (nth start 4) stop-duration-min) 60)
-               stop-duration-s]]
+         start (add-duration start-0 start-duration)
+         stop-duration (tuc/draw-normal 5.7 1.37)
+         stop (add-duration stop-0 stop-duration)]
      [start stop])))
 
 (defn treatment-times
