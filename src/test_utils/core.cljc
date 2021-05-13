@@ -61,7 +61,11 @@
     number
     (str "0" number)))
 
-(defn rand-uuid
+(defn rand-uuid []
   "Return a random UUID."
-  ([] (java.util.UUID/randomUUID))
-  ([n] (repeatedly n (fn [] (java.util.UUID/randomUUID)))))
+  (java.util.UUID/randomUUID))
+
+(defn rand-uuids
+  "Return many random UUIDs."
+  ([] (rand-uuids 3))
+  ([n] (repeatedly n rand-uuid)))
