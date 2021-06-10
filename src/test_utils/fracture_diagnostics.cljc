@@ -539,7 +539,7 @@
    (let [volume-magnitude (condp = volume-unit
                             :bbl (tuc/draw-normal 6986.70 1992.30)
                             :m3  (tuc/draw-normal 813.47 286.89))]
-     [volume-magnitude volume-unit])))
+     (make-measurement volume-magnitude volume-unit))))
 
 (defn typical-proppant-mass
   ([] (let [mass-unit (rand-mass-unit)]
@@ -661,15 +661,8 @@
         measurement (generate-measurement-f unit)]
     [measurement (measurement-as-f measurement (first (remove (partial = unit) units)))]))
 
-(generate-measurement-pair (set (quantity-unit-map :volume))
-                           rand-volume-unit typical-pumped-volume volume-as)
-
 (defn rand-measurement
   ([]
    (rand-measurement (rand-physical-quantity)))
   ([physical-quantity]
    ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
-
-((quantity-generate-measurement-map :duration))
-((quantity-generate-measurement-map :duration) (rand-unit :duration))
-(rand-measurement :duration)
