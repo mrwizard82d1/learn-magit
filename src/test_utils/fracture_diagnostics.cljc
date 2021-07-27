@@ -534,7 +534,7 @@
 
 (defn typical-pumped-volume
   ([] (let [volume-unit (rand-volume-unit)]
-        [(typical-pumped-volume volume-unit) volume-unit]))
+        (typical-pumped-volume volume-unit)))
   ([volume-unit]
    (let [volume-magnitude (condp = volume-unit
                             :bbl (tuc/draw-normal 6986.70 1992.30)
