@@ -74,10 +74,12 @@
 (def other last)
 
 (defn as-f [from-unit to-unit factor]
-  (fn [[magnitude from] to]
-    (condp = [from to]
-      [from-unit to-unit] [(* magnitude factor) to]
-      [to-unit from-unit] [(/ magnitude factor) to])))
+  (fn [[magnitude from :as from-measurement] to]
+    (if (= from to)
+      from-measurement
+      (condp = [from to]
+        [from-unit to-unit] [(* magnitude factor) to]
+        [to-unit from-unit] [(/ magnitude factor) to]))))
 
 (defn density-as [[from-magnitude from-unit substance] to-unit]
   (let [[target-magnitude _] ((as-f :lb-per-cu-ft :kg-per-m3 16.0185) [from-magnitude from-unit] to-unit)]
@@ -133,8 +135,14 @@
    (typical-stage-extent typical-stage-top))
   ([top-f]
    (let [top (top-f)
-         length (typical-stage-length)]
-     (vector top (+ top length)))))
+         raw-length (typical-stage-length)
+         length (length-as raw-length (unit top))]
+     (vector top (make-measurement (+ (magnitude top) (magnitude length)) (unit length))))))
+
+(defn typical-stage-bottom
+  ([] (second (typical-stage-extent)))
+  ([length-unit]
+   (second (typical-stage-extent (constantly (typical-stage-top length-unit))))))
 
 (defn rand-easting []
   (let [minimum-easting 167000
