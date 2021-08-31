@@ -56,6 +56,21 @@
   ([n] (sample-normal n 0.0 1.0))
   ([n mu sigma] (ksd/sample n (ksd/normal {:mu mu :sd sigma}))))
 
+(defn draw-pareto
+  "Draw a single value from a pareto distribution with `scale`
+   (default log base 4 of 5) and shape (default 1)."
+  ([] (draw-pareto (/ (Math/log 5) (Math/log 4)) 1))
+  ([shape scale] (ksd/draw (ksd/pareto {:shape shape
+                                        :scale scale}))))
+
+(defn sample-pareto
+  "Return a sample of n (default 3) values from the pareto distribution
+  with shape, `shape` (default log base 4 of 5), and scale, `scale` (default 1.0)."
+  ([] (sample-pareto 3))
+  ([n] (sample-pareto n (/ (Math/log 5) (Math/log 4)) 1.0))
+  ([n shape scale] (ksd/sample n (ksd/pareto {:shape shape
+                                              :scale scale}))))
+
 (defn two-digit-zero-pad [number]
   (if (>= number 10)
     number
