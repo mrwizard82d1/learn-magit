@@ -678,6 +678,12 @@
   ([physical-quantity]
    ((quantity-generate-measurement-map physical-quantity) (rand-unit physical-quantity))))
 
-((quantity-generate-measurement-map :duration))
-((quantity-generate-measurement-map :duration) (rand-unit :duration))
-(rand-measurement :duration)
+(def formation-connection-types [:plug-and-perf :sliding-sleeve :single-point-entry :open-hole])
+
+(defn rand-formation-connection-type []
+  ;; Sampled using a power (Pareto) distribution
+  (rand-nth (concat (repeat 72 :plug-and-perf)
+                    (repeat 12 :sliding-sleeve)
+                    (repeat 5 :single-point-entry)
+                    (repeat 3 :open-hole))))
+
