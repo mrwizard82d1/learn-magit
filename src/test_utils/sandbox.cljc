@@ -14,3 +14,7 @@
   ([] (hex-uuid (random-uuid)))
   ([uuid] (clj-str/join (map #(Long/toHexString %) [(.getMostSignificantBits uuid) (.getLeastSignificantBits uuid)]))))
 
+(defn color []
+  (map clj-str/join
+       (map #(concat ["0x"] %)
+            (take 4 (map clj-str/join (partition 2 (hex-uuid)))))))
