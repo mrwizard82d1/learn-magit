@@ -5,5 +5,13 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [kixi/stats "0.5.4"]]
-  :repl-options {:init-ns test-utils.core}
+  :repl-options {:init (require '[test-utils
+                                  [core :as tuc]
+                                  [address :as addr]
+                                  [fracture-diagnostics :as fd]
+                                  [retail :as tur]
+                                  [sandbox :as sb]
+                                  [word-source :as ws]])
+                 }
+  
   :source-paths ["src", "test"])
