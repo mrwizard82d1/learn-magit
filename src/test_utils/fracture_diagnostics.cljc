@@ -537,8 +537,14 @@
 (defn rand-depth-datum []
   (rand-nth depth-datums))
 
-(defn typical-kelly-bushing-elevation []
-  (tuc/draw-normal 30.48 (/ 1.00 3.00)))
+(defn typical-kelly-bushing-elevation
+  ([] (let [kb-unit (rand-length-unit)]
+        (typical-kelly-bushing-elevation kb-unit)))
+  ([kb-unit]
+   (let [kb-magnitude (condp = kb-unit
+                        :ft (tuc/draw-normal 30.48 (/ 1.00 3.00))
+                        :m (tuc/draw-normal 10.0 (/ (/ 1 3) 30.48)))]
+     (make-measurement kb-magnitude kb-unit))))
 
 (defn typical-pumped-volume
   ([] (let [volume-unit (rand-volume-unit)]
