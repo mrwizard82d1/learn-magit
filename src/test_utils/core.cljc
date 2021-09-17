@@ -1,5 +1,6 @@
 (ns test-utils.core
-  (:require [kixi.stats.distribution :as ksd]))
+  (:require [clojure.string :as cljstr]
+            [kixi.stats.distribution :as ksd]))
 
 #?(:cljs (enable-console-print!))
 
@@ -84,3 +85,12 @@
   "Return many random UUIDs."
   ([] (rand-uuids 3))
   ([n] (repeatedly n rand-uuid)))
+
+(defn rand-argb
+  ([] (rand-argb :bytes))
+  ([tag]
+   (let [floats->bytes (fn [x] (-> (* 256 x) int Integer/toHexString))]
+        (case tag
+          :float (vec (repeatedly 4 rand))
+          :bytes (vec (map floats->bytes (rand-argb :float)))
+          :hex-string (cljstr/join (rand-argb :bytes))))))
