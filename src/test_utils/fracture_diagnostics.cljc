@@ -420,6 +420,13 @@
                                   (magnitude (pressure-as (typical-monitor-pressure :psi) :kPa)))]
      (make-measurement pressure-magnitude pressure-unit))))
 
+(defn typical-monitor-pressure-seq
+  ([] (typical-monitor-pressure-seq (rand-pressure-unit)))
+  ([pressure-unit] (cond (= pressure-unit :psi)
+                         (map #(make-measurement % :psi) (p-mon-seq))
+                         (= pressure-unit :kPa)
+                         (map #(pressure-as % pressure-unit) (typical-monitor-pressure-seq :psi)))))
+
 (def measured-at-location [:downhole :surface])
 
 (defn typical-monitor-temperature
