@@ -413,12 +413,8 @@
     (tuc/draw-normal mean sigma)))
 
 (defn typical-monitor-pressure
-  ([] (typical-monitor-pressure (rand-pressure-unit)))
-  ([pressure-unit]
-   (let [pressure-magnitude (cond (= pressure-unit :psi) (first (p-mon-seq))
-                                  (= pressure-unit :kPa)
-                                  (magnitude (pressure-as (typical-monitor-pressure :psi) :kPa)))]
-     (make-measurement pressure-magnitude pressure-unit))))
+  ([] (take 1 (typical-monitor-pressure-seq)))
+  ([pressure-unit] (take 1 (typical-monitor-pressure-seq pressure-unit))))
 
 (defn typical-monitor-pressure-seq
   ([] (typical-monitor-pressure-seq (rand-pressure-unit)))
