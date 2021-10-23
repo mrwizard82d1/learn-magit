@@ -412,16 +412,16 @@
         sigma (/ mean 6)]
     (tuc/draw-normal mean sigma)))
 
-(defn typical-monitor-pressure
-  ([] (take 1 (typical-monitor-pressure-seq)))
-  ([pressure-unit] (take 1 (typical-monitor-pressure-seq pressure-unit))))
-
 (defn typical-monitor-pressure-seq
   ([] (typical-monitor-pressure-seq (rand-pressure-unit)))
   ([pressure-unit] (cond (= pressure-unit :psi)
                          (map #(make-measurement % :psi) (p-mon-seq))
                          (= pressure-unit :kPa)
                          (map #(pressure-as % pressure-unit) (typical-monitor-pressure-seq :psi)))))
+
+(defn typical-monitor-pressure
+  ([] (take 1 (typical-monitor-pressure-seq)))
+  ([pressure-unit] (take 1 (typical-monitor-pressure-seq pressure-unit))))
 
 (def measured-at-location [:downhole :surface])
 
