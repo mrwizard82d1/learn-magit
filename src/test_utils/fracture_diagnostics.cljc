@@ -453,6 +453,22 @@
                   :F (make-measurement temperature-f-surface temperature-unit measured-at)
                   :C (temperature-as (typical-monitor-temperature :F measured-at) :C))))))
 
+(defn typical-monitor-temperature-seq
+  ([] (let [temperature-unit (rand-temperature-unit)
+            measured-at (rand-nth measured-at-location)]
+        (typical-monitor-temperature-seq temperature-unit measured-at)))
+  ([unit-or-location]
+   (let [is-unit #{:C :F}
+         is-location (set measured-at-location)
+         [temperature-unit measured-at]
+         (cond (is-unit unit-or-location)
+               [unit-or-location (rand-nth measured-at-location)]
+               (is-location unit-or-location)
+               [(rand-temperature-unit) unit-or-location])]
+     (typical-monitor-temperature-seq temperature-unit measured-at)))
+  ([temperature-unit measured-at]
+   (repeatedly (fn [] (typical-monitor-temperature temperature-unit measured-at)))))
+
 (defn typical-slurry-rate
   ([]
    (let [slurry-rate-unit (rand-slurry-rate-unit)]
