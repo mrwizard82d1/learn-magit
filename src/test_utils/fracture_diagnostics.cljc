@@ -106,15 +106,34 @@
       (apply make-measurement target-temperature to location)
       (make-measurement target-temperature to))))
 
-(defn typical-vertical-depth []
-  (tuc/draw-normal 8000 1216))
+(defn typical-vertical-depth
+  ([] (typical-vertical-depth (rand-length-unit)))
+  ([length-unit]
+   (let [typical-vertical-depth-in-feet
+         (fn [] (make-measurement (tuc/draw-normal 8000 1216) :ft))]
+     (condp = length-unit
+       :ft (typical-vertical-depth-in-feet)
+       :m (length-as (typical-vertical-depth-in-feet) :m)))))
 
-(defn typical-measured-depth []
-  (+ (tuc/draw-normal 8000 1216)
-     (* 5280 (rand))))
+(defn typical-measured-depth
+  ([] (typical-measured-depth (rand-length-unit)))
+  ([length-unit]
+   (let [typical-measured-depth-in-feet
+         (fn [] (make-measurement (+ (tuc/draw-normal 8000 1216)  ;; horizontal
+                                     (* 5280 (rand)))  ;; typical vertical
+                                  :ft))]
+     (condp = length-unit
+       :ft (typical-measured-depth-in-feet)
+       :m (length-as (typical-measured-depth-in-feet) :m)))))
 
-(defn typical-toe-measured-depth []
-  (tuc/draw-normal 18000 1500))
+(defn typical-toe-measured-depth
+  ([] (typical-toe-measured-depth (rand-length-unit)))
+  ([length-unit]
+   (let [typical-toe-measured-depth-in-feet
+         (fn [] (make-measurement (tuc/draw-normal 18000 1500) :ft))]
+     (condp = length-unit
+       :ft (typical-toe-measured-depth-in-feet)
+       :m (length-as (typical-toe-measured-depth-in-feet) :m)))))
 
 (defn typical-stage-top
   ([] (typical-stage-top (rand-length-unit)))
@@ -708,4 +727,3 @@
                     (repeat 12 :sliding-sleeve)
                     (repeat 5 :single-point-entry)
                     (repeat 3 :open-hole))))
-
