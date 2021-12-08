@@ -263,7 +263,7 @@
   (tuc/draw-normal 3102 497))
 
 (defn typical-inclination []
-  (tuc/draw-normal 92.2 2.4))
+  (make-measurement (tuc/draw-normal 92.2 2.4) :deg))
 
 (defn typical-azimuth [plot-angle]
   (make-measurement (tuc/draw-normal plot-angle 1.24) :deg))
