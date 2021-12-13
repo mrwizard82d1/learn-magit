@@ -72,6 +72,20 @@
   ([n shape scale] (ksd/sample n (ksd/pareto {:shape shape
                                               :scale scale}))))
 
+(defn draw-uniform
+  "Draw a single value from the uniform distribution with lower bound, `lower`
+  (default 0.0), and upper bound, `upper` (default 1.0)."
+  ([] (draw-uniform 0.0 1.0))
+  ([lower upper] (ksd/draw (ksd/uniform {:a lower :b upper}))))
+
+(defn sample-uniform
+  "Return a sample of n (default 3) values from the uniform distribution
+  with lower bound, `lower` (default 0.0), and upper bound, `upper`
+  (default 1.0)."
+  ([] (sample-uniform 3 0.0 1.0))
+  ([n] (sample-uniform n 0.0 1.0))
+  ([n lower upper] (ksd/sample n (ksd/uniform {:a lower :b upper}))))
+
 (defn two-digit-zero-pad [number]
   (if (>= number 10)
     number
