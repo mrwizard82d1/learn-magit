@@ -106,8 +106,8 @@
       (apply make-measurement target-temperature to location)
       (make-measurement target-temperature to))))
 
-(defn typical-vertical-depth
-  ([] (typical-vertical-depth (rand-length-unit)))
+(defn typical-vertical-depth-subsea
+  ([] (typical-vertical-depth-subsea (rand-length-unit)))
   ([length-unit]
    (let [typical-vertical-depth-in-feet
          (fn [] (make-measurement (tuc/draw-normal 8000 1216) :ft))]
@@ -560,7 +560,7 @@
   ([] (typical-subsurface-location (rand-length-unit)))
   ([length-unit]
    (let [typical-location-in-ft (vec (map #(make-measurement % :ft)
-                                          [(rand-easting) (rand-northing) (typical-vertical-depth)]))]
+                                          [(rand-easting) (rand-northing) (typical-vertical-depth-subsea)]))]
      (if (= length-unit :ft)
        typical-location-in-ft
        (vec (map #(length-as % :m) typical-location-in-ft))))))
