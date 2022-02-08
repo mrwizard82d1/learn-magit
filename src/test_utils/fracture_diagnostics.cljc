@@ -247,9 +247,9 @@
 
 (defn stage-extents []
   (let [extent-0 (typical-stage-extent)
-        next-fn (fn [[top-n-1 bottom-n-1] extent-0]
-                  (let [bottom (- top-n-1 (typical-stage-separation))
-                        top (- bottom (typical-stage-length))]
+        next-fn (fn [[top-n-1 _]]
+                  (let [bottom (make-measurement (- (magnitude top-n-1) (typical-stage-separation)) (unit top-n-1))
+                        top (make-measurement (- (magnitude bottom) (typical-stage-length)) (unit bottom))]
                     [top bottom]))]
     (iterate next-fn extent-0)))
 
