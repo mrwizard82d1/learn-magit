@@ -186,10 +186,12 @@
   (inc (rem (tuc/rand-2) 50)))
 
 (defn rand-isip []
-  (Math/abs (tuc/draw-normal 5061 121)))
+  (make-measurement (Math/abs (tuc/draw-normal 5061 121))
+                    :psi))
 
 (defn rand-shmin []
-  (Math/abs (tuc/draw-normal 2.29 0.05)))
+  (make-measurement (Math/abs (tuc/draw-normal 2.29 0.05))
+                    :psi))
 
 (defn rand-cluster-count []
   (inc (rand-nth (range 2 7))))
@@ -243,13 +245,19 @@
      (iterate next-fn [start-0 stop-0]))))
 
 (defn typical-stage-separation []
-  (tuc/draw-normal 45 3))
+  (make-measurement (tuc/draw-normal 45 3) :ft))
 
 (defn stage-extents []
   (let [extent-0 (typical-stage-extent)
         next-fn (fn [[top-n-1 _]]
-                  (let [bottom (make-measurement (- (magnitude top-n-1) (typical-stage-separation)) (unit top-n-1))
-                        top (make-measurement (- (magnitude bottom) (typical-stage-length)) (unit bottom))]
+                  (let [bottom (make-measurement (- (magnitude top-n-1)
+                                                    (magnitude (length-as (typical-stage-separation)
+                                                                          (unit top-n-1))))
+                                                 (unit top-n-1))
+                        top (make-measurement (- (magnitude bottom)
+                                                 (magnitude (length-as (typical-stage-length)
+                                                                       (unit bottom))))
+                                              (unit bottom))]
                     [top bottom]))]
     (iterate next-fn extent-0)))
 
