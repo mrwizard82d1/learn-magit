@@ -108,3 +108,9 @@
           :float (vec (repeatedly 4 rand))
           :bytes (vec (map floats->bytes (rand-argb :float)))
           :hex-string (cljstr/join (rand-argb :bytes))))))
+
+(defn total-seconds->hms [total-seconds]
+  (let [hours (quot total-seconds 3600)
+        minutes (quot (rem total-seconds 3600) 60)
+        seconds (rem (rem total-seconds 3600) 60)]
+    [hours minutes seconds]))
