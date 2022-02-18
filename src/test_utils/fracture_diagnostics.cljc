@@ -163,6 +163,21 @@
   ([length-unit]
    (second (typical-stage-extent (constantly (typical-stage-top length-unit))))))
 
+(defn typical-stage-completion-changeover
+  "Calculates the typical (empirically determined) time (in seconds) to change completion operationss from one stage to another"
+  ([]
+   (let [global-stage-seq-no (tuc/rand-range 150)]
+     (typical-stage-completion-changeover global-stage-seq-no)))
+  ([global-stage-seq-no]
+   ;; Empirically, a model for generating these times seems to be a generally linearly decreasing component (the team gets
+   ;; better at changeover as the job goes on) with a "normally distibuted" "noise" or error component (with a large variance).
+   ;; (I think I may have miscalculated this component)
+   (let [slope -38.5634
+         intercept 10115.1
+         noise (tuc/draw-normal 0 1555.5)]
+     (+ (+ (* slope global-stage-seq-no) intercept)
+        noise))))
+
 (defn rand-easting []
   (let [minimum-easting 167000
         maximum-easting 833000]
