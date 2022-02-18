@@ -163,6 +163,28 @@
   ([length-unit]
    (second (typical-stage-extent (constantly (typical-stage-top length-unit))))))
 
+(defn typical-stage-completion-time
+  "Calculates the typical time in seconds for a stage to be completed."
+  []
+  ;; Empirically, a (relatively poor) model for generating these values is a normal distribution. A better model might be similar
+  ;; to the model for `typical-stage-completion-changeover`.
+  (tuc/draw-normal 7454.19 2166.79))
+
+(defn typical-stage-time-range
+  "Calculates the typical time range for a stage."
+  ([]
+   (let [start-time (tuc/rand-timestamp 2018 2029)]
+     (typical-stage-time-range start-time)))
+  ([start-time]
+   (let [completion-time-in-seconds (typical-stage-completion-time)
+         ;; Not half-even rounding but perhaps good enough
+         completion-time-in-hms (map #(Math/round %)
+                                     (tuc/total-seconds->hms completion-time-in-seconds))
+         stop-time-hms (map + (drop 3 start-time) completion-time-in-hms)
+         stop-time (vec (flatten
+                         [(take 3 start-time) stop-time-hms]))]
+     [start-time stop-time])))
+
 (defn typical-stage-completion-changeover
   "Calculates the typical (empirically determined) time (in seconds) to change completion operationss from one stage to another"
   ([]
