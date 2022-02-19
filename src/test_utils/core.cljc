@@ -1,6 +1,7 @@
 (ns test-utils.core
   (:require [clojure.string :as cljstr]
-            [kixi.stats.distribution :as ksd]))
+            [kixi.stats.distribution :as ksd])
+  (:import (java.time Duration LocalDateTime LocalTime)))
 
 #?(:cljs (enable-console-print!))
 
@@ -114,3 +115,12 @@
         minutes (quot (rem total-seconds 3600) 60)
         seconds (rem (rem total-seconds 3600) 60)]
     [hours minutes seconds]))
+
+(defn timestamp->java-time [time-stamp]
+  "Converts a timestamp to a `java.time.LocalDateTime`."
+  (apply #(LocalDateTime %1 %2 %3 %4 %5 %6) time-stamp))
+
+(defn java-time->timestamp [java-time]
+  "Converts a `java.time.LocalDateTime` to a timestamp."
+  (juxt [#(.getYear %) #(.getMonthValue %) #(.getDayOfMonth %)
+         #(.getHour %) #(.getMinute %) #(.getSecond %)] java-time))
