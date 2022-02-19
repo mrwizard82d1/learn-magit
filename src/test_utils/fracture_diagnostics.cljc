@@ -198,8 +198,16 @@
        :starting-at (let [start-time reference-time
                           java-start-time java-reference-time
                           java-stop-time (.addTo java-completion-time java-start-time)
-                          stop-time (tuc/java-time->timestamp java-stop-time)]))
-     [start-time stop-time])))
+                          stop-time (tuc/java-time->timestamp java-stop-time)]
+                      [start-time stop-time])
+       :starting-after (let [previous-java-stop-time java-reference-time
+                             java-changeover
+                             (Duration/ofSeconds (Math/round (typical-stage-completion-changeover)))
+                             java-start-time (.addTo java-changeover previous-java-stop-time)
+                             java-stop-time (.addTo java-completion-time java-start-time)
+                             start-time (tuc/java-time->timestamp java-start-time)
+                             stop-time (tuc/java-time->timestamp java-stop-time)]
+                         [start-time stop-time])))))
 
 (defn rand-easting []
   (let [minimum-easting 167000
