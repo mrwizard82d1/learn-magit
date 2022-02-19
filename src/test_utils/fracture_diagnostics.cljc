@@ -3,7 +3,7 @@
      :clj (:require (test-utils [core :as tuc])))
   ;; The following import fails in ClojureScript, but I am not ready to investigate js-joda/core. Similarly,
   ;; all uses of `java.time.LocalDateTime` will fail in ClojureScript.
-  (:import (java.time LocalDateTime LocalTime)))
+  (:import (java.time Duration LocalDateTime LocalTime)))
 
 (def physical-quantities [:angle
                           :duration
@@ -177,12 +177,9 @@
      (typical-stage-time-range start-time)))
   ([start-time]
    (let [completion-time-in-seconds (typical-stage-completion-time)
-         ;; Not half-even rounding but perhaps good enough
-         completion-time-in-hms (map #(Math/round %)
-                                     (tuc/total-seconds->hms completion-time-in-seconds))
-         stop-time-hms (map + (drop 3 start-time) completion-time-in-hms)
-         stop-time (vec (flatten
-                         [(take 3 start-time) stop-time-hms]))]
+         completion-time (Duration/ofSeconds completion-time-in-seconds)
+         start-time (apply #(LocalDateTime/of %1 %2 %3 %4 %5 %6) start-time)
+         stop-time (.addTo completion-time start-time)]
      [start-time stop-time])))
 
 (defn typical-stage-completion-changeover
