@@ -170,18 +170,6 @@
   ;; to the model for `typical-stage-completion-changeover`.
   (tuc/draw-normal 7454.19 2166.79))
 
-(defn typical-stage-time-range
-  "Calculates the typical time range for a stage."
-  ([]
-   (let [start-time (tuc/rand-timestamp 2018 2029)]
-     (typical-stage-time-range start-time)))
-  ([start-time]
-   (let [completion-time-in-seconds (typical-stage-completion-time)
-         completion-time (Duration/ofSeconds completion-time-in-seconds)
-         start-time (apply #(LocalDateTime/of %1 %2 %3 %4 %5 %6) start-time)
-         stop-time (.addTo completion-time start-time)]
-     [start-time stop-time])))
-
 (defn typical-stage-completion-changeover
   "Calculates the typical (empirically determined) time (in seconds) to change completion operationss from one stage to another"
   ([]
@@ -196,6 +184,22 @@
          noise (tuc/draw-normal 0 1555.5)]
      (+ (+ (* slope global-stage-seq-no) intercept)
         noise))))
+
+(defn typical-stage-time-range
+  "Calculates the typical time range for a stage."
+  ([]
+   (let [start-time (tuc/rand-timestamp 2018 2029)]
+     (typical-stage-time-range :starting-at start-time)))
+  ([qualifier reference-time]
+   (let [completion-time-in-seconds (typical-stage-completion-time)
+         java-completion-time (Duration/ofSeconds completion-time-in-seconds)
+         java-reference-time (tuc/timestamp->java-time reference-time)]
+     (case qualifier
+       :starting-at (let [start-time reference-time
+                          java-start-time java-reference-time
+                          java-stop-time (.addTo java-completion-time java-start-time)
+                          stop-time (tuc/java-time->timestamp java-stop-time)]))
+     [start-time stop-time])))
 
 (defn rand-easting []
   (let [minimum-easting 167000
