@@ -118,9 +118,8 @@
 
 (defn timestamp->java-time [time-stamp]
   "Converts a timestamp to a `java.time.LocalDateTime`."
-  (apply #(LocalDateTime %1 %2 %3 %4 %5 %6) time-stamp))
+  (apply #(LocalDateTime/of %1 %2 %3 %4 %5 %6) time-stamp))
 
-(defn java-time->timestamp [java-time]
-  "Converts a `java.time.LocalDateTime` to a timestamp."
-  (juxt [#(.getYear %) #(.getMonthValue %) #(.getDayOfMonth %)
-         #(.getHour %) #(.getMinute %) #(.getSecond %)] java-time))
+(def java-time->timestamp
+  (juxt #(.getYear %) #(.getMonthValue %) #(.getDayOfMonth %)
+         #(.getHour %) #(.getMinute %) #(.getSecond %)))
