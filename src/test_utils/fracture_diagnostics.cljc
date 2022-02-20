@@ -321,8 +321,15 @@
         y-distance (* euclidean-distance (Math/sin (* (/ (+ plot-angle 90) 180) #?(:cljs Math.PI))))]
     [x-distance y-distance]))
 
-(defn typical-isip []
-  (tuc/draw-normal 3102 497))
+(defn typical-isip
+  "Calculate a random but typical ISIP (instantaneous shut-in pressure)"
+  ([]
+   (let [unit (rand-pressure-unit)]
+     (typical-isip unit)))
+  ([unit]
+   (case unit
+     :psi (make-measurement (tuc/draw-normal 3102 497) :psi)
+     :kPa (pressure-as (typical-isip :psi) :kPa))))
 
 (defn typical-inclination []
   (make-measurement (tuc/draw-normal 92.2 2.4) :deg))
