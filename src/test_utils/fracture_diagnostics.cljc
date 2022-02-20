@@ -109,11 +109,20 @@
 (defn typical-vertical-depth-subsea
   ([] (typical-vertical-depth-subsea (rand-length-unit)))
   ([length-unit]
-   (let [typical-vertical-depth-in-feet
-         (fn [] (make-measurement (tuc/draw-normal 8000 1216) :ft))]
-     (condp = length-unit
-       :ft (typical-vertical-depth-in-feet)
-       :m (length-as (typical-vertical-depth-in-feet) :m)))))
+   (case length-unit
+     :ft (make-measurement (tuc/draw-normal 8000 1216) :ft)
+     :m (length-as (typical-vertical-depth-subsea) :m))))
+
+(defn typical-measured-depth-of-vertical
+  "Calculate the typical measured depth of the vertical portion of a well."
+  ([]
+   (let [length-unit (rand-length-unit)]
+     (typical-measured-depth-of-vertical length-unit)))
+  ([length-unit]
+   (case length-unit
+     ;; The value of 5280 feet was determined empirically; the standard deviation of 500 feet is just a guess. :)
+     :ft (make-measurement (tuc/draw-normal 5280 500) :ft)
+     :m (length-as (typical-measured-depth-of-vertical :ft) :m))))
 
 (defn typical-measured-depth
   ([] (typical-measured-depth (rand-length-unit)))
@@ -129,11 +138,9 @@
 (defn typical-toe-measured-depth
   ([] (typical-toe-measured-depth (rand-length-unit)))
   ([length-unit]
-   (let [typical-toe-measured-depth-in-feet
-         (fn [] (make-measurement (tuc/draw-normal 18000 1500) :ft))]
-     (condp = length-unit
-       :ft (typical-toe-measured-depth-in-feet)
-       :m (length-as (typical-toe-measured-depth-in-feet) :m)))))
+   (condp = length-unit
+     :ft (make-measurement (tuc/draw-normal 18000 1500) :ft)
+     :m (length-as (typical-toe-measured-measured-depth) :m))))
 
 (defn typical-stage-top
   ([] (typical-stage-top (rand-length-unit)))
