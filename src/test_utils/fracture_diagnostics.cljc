@@ -124,16 +124,23 @@
      :ft (make-measurement (tuc/draw-normal 5280 500) :ft)
      :m (length-as (typical-measured-depth-of-vertical :ft) :m))))
 
+(defn typical-extent-of-horizontal
+  "Calculates a typical 'extent' (from the heel) of the horizontal portion of a well."
+  ([]
+   (typical-extent-of-horizontal (rand-length-unit)))
+  ([length-unit]
+   (case length-unit
+     :ft (make-measurement (tuc/draw-normal 8000 1667) length-unit)
+     :m (length-as (typical-extent-of-horizontal :ft) length-unit))))
+
 (defn typical-measured-depth
   ([] (typical-measured-depth (rand-length-unit)))
   ([length-unit]
-   (let [typical-measured-depth-in-feet
-         (fn [] (make-measurement (+ (tuc/draw-normal 8000 1216)  ;; horizontal
-                                     (* 5280 (rand)))  ;; typical vertical
-                                  :ft))]
-     (condp = length-unit
-       :ft (typical-measured-depth-in-feet)
-       :m (length-as (typical-measured-depth-in-feet) :m)))))
+   (case length-unit
+     :ft (make-measurement (+ (tuc/draw-normal 8000 1216)  ;; horizontal portion
+                              (typical-measured-depth-of-vertical length-unit))
+                           length-unit)
+     :m (length-as (typical-measured-depth) length-unit))))
 
 (defn typical-toe-measured-depth
   ([] (typical-toe-measured-depth (rand-length-unit)))
