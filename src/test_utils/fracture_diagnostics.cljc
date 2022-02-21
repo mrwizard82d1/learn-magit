@@ -133,14 +133,14 @@
      :ft (make-measurement (tuc/draw-normal 8000 1667) length-unit)
      :m (length-as (typical-extent-of-horizontal :ft) length-unit))))
 
-(defn typical-measured-depth
-  ([] (typical-measured-depth (rand-length-unit)))
+(defn typical-measured-depth-in-horizontal
+  ([] (typical-measured-depth-in-horizontal (rand-length-unit)))
   ([length-unit]
    (case length-unit
      :ft (make-measurement (+ (magnitude (typical-measured-depth-of-vertical length-unit))
                               (magnitude (typical-extent-of-horizontal length-unit)))
                            length-unit)
-     :m (length-as (typical-measured-depth) length-unit))))
+     :m (length-as (typical-measured-depth-in-horizontal) length-unit))))
 
 (defn typical-toe-measured-depth
   ([] (typical-toe-measured-depth (rand-length-unit)))
@@ -149,12 +149,7 @@
      :ft (make-measurement (tuc/draw-normal 18000 1500) :ft)
      :m (length-as (typical-toe-measured-measured-depth) :m))))
 
-(defn typical-stage-top
-  ([] (typical-stage-top (rand-length-unit)))
-  ([length-unit]
-   (condp = length-unit
-     :ft (make-measurement (tuc/draw-normal 13750 2150) :ft)
-     :m (length-as (typical-stage-top :ft) :m))))
+(def typical-stage-top typical-measured-depth-in-horizontal)
 
 (defn typical-stage-length
   ([] (typical-stage-length (rand-length-unit)))
