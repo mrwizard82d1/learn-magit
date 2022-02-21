@@ -137,8 +137,8 @@
   ([] (typical-measured-depth (rand-length-unit)))
   ([length-unit]
    (case length-unit
-     :ft (make-measurement (+ (tuc/draw-normal 8000 1216)  ;; horizontal portion
-                              (typical-measured-depth-of-vertical length-unit))
+     :ft (make-measurement (+ (magnitude (typical-measured-depth-of-vertical length-unit))
+                              (magnitude (typical-extent-of-horizontal length-unit)))
                            length-unit)
      :m (length-as (typical-measured-depth) length-unit))))
 
