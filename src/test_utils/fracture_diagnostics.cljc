@@ -147,7 +147,7 @@
   ([length-unit]
    (condp = length-unit
      :ft (make-measurement (tuc/draw-normal 18000 1500) :ft)
-     :m (length-as (typical-toe-measured-measured-depth) :m))))
+     :m (length-as (typical-toe-measured-depth) :m))))
 
 (def typical-stage-top typical-measured-depth-in-horizontal)
 
