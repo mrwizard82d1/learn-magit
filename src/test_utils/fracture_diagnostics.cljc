@@ -179,7 +179,7 @@
      :ft (make-measurement (tuc/draw-normal 495.763 106.098) length-unit)
      :m (length-as (typical-stage-separation :ft) length-unit)))
   ([] (let [length-unit (rand-length-unit)]
-        (typical-stage-separation length-unit))))
+        (typical-stage-extent length-unit))))
 
 (defn typical-stage-completion-time
   "Calculates the typical time in seconds for a stage to be completed."
