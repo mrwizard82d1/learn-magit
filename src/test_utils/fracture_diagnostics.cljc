@@ -814,3 +814,13 @@
                     (repeat 12 :sliding-sleeve)
                     (repeat 5 :single-point-entry)
                     (repeat 3 :open-hole))))
+
+(defn rand-stage-correction []
+        (let [well (rand-nth [:demo-1h :demo-2h :demo-4h])
+              stage (rand-nth (well {:demo-1h (range 1 (inc 50))
+                                     :demo-2h (range 1 (inc 50))
+                                     :demo-4h (range 1 (inc 35))}))
+              status (rand-nth (concat (repeat 72 :confirmed)
+                                       (repeat 12 :unconfirmed)
+                                       (repeat 8 :new)))]
+          [well stage status]))
