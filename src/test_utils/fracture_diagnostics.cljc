@@ -261,9 +261,12 @@
   (make-measurement (Math/abs (tuc/draw-normal 5061 121))
                     :psi))
 
-(defn rand-shmin []
-  (make-measurement (Math/abs (tuc/draw-normal 2.29 0.05))
-                    :psi))
+(defn rand-shmin
+  ([]
+   (let [pressure-unit (rand-pressure-unit)]
+     (rand-shmin pressure-unit)))
+  ([pressure-unit]
+   (pressure-as (make-measurement (Math/abs (tuc/draw-normal 2.29 0.05)) :psi) pressure-unit)))
 
 (defn rand-cluster-count []
   (inc (rand-nth (range 2 7))))
