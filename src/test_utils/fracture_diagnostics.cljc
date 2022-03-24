@@ -257,9 +257,11 @@
 (defn rand-stage-number []
   (inc (rem (tuc/rand-2) 50)))
 
-(defn rand-isip []
-  (make-measurement (Math/abs (tuc/draw-normal 5061 121))
-                    :psi))
+(defn rand-isip
+  ([] (let [pressure-unit (rand-pressure-unit)]
+           (rand-isip pressure-unit)))
+  ([pressure-unit] (pressure-as (make-measurement (Math/abs (tuc/draw-normal 5061 121)) :psi)
+                                pressure-unit)))
 
 (defn rand-shmin
   ([]
