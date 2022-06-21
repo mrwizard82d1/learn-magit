@@ -786,8 +786,8 @@
        :hp (power-as (typical-power :W) :hp)))))
 
 (def quantity-generate-measurement-map
-  {:angle                  (fn [& _] (typical-azimuth (rand-nth (range 360))))
-   :duration               (fn [& _] (make-measurement (rand-nth (range 60)) :min))
+  {:angle                  (fn [& _] (typical-azimuth (* 360 (rand))))
+   :duration               (fn [& _] (make-measurement (* 60 (rand)) :min))
    :density                typical-density
    :energy                 typical-total-pump-energy
    :force                  typical-force
