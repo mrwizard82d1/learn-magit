@@ -185,9 +185,11 @@
   "Calculate a 'typical' next stage (toward the heel; higher top) from the top of the 'previous' stage."
   (let [stage-length-unit (unit previous-top)
         separation (typical-stage-separation stage-length-unit)
-        new-bottom (make-measurement (- (magnitude previous-top) (magnitude separation)) stage-length-unit)
-        extent (typical-stage-separation stage-length-unit)]
-    extent))
+        next-bottom-magnitude (- (magnitude previous-top) (magnitude separation))
+        next-bottom (make-measurement next-bottom-magnitude stage-length-unit)
+        length (typical-stage-length stage-length-unit)
+        next-top (make-measurement (- next-bottom-magnitude (magnitude length)) stage-length-unit)]
+    [next-top next-bottom]))
 
 (defn typical-stage-completion-time
   "Calculates the typical time in seconds for a stage to be completed."
