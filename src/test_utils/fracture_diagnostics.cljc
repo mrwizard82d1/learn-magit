@@ -181,6 +181,14 @@
      :ft (make-measurement (tuc/draw-normal 495.763 106.098) length-unit)
      :m (length-as (typical-stage-separation :ft) length-unit))))
 
+(defn typical-next-stage [previous-top]
+  "Calculate a 'typical' next stage (toward the heel; higher top) from the top of the 'previous' stage."
+  (let [stage-length-unit (unit previous-top)
+        separation (typical-stage-separation stage-length-unit)
+        new-bottom (make-measurement (- (magnitude previous-top) (magnitude separation)) stage-length-unit)
+        extent (typical-stage-separation stage-length-unit)]
+    extent))
+
 (defn typical-stage-completion-time
   "Calculates the typical time in seconds for a stage to be completed."
   []
