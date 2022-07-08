@@ -191,6 +191,19 @@
         next-top (make-measurement (- next-bottom-magnitude (magnitude length)) stage-length-unit)]
     [next-top next-bottom]))
 
+(defn phony-next-stage [previous-top]
+  "Calculate a 'phony' next stage (toward the heel; higher top) from the top of the 'previous' stage.
+
+  The returned units are **always** US Oilfield units (ft). The implementation uses hard-coded constants."
+  (let [previous-top-us (length-as previous-top :ft)
+        stage-length-unit (unit previous-top-us)
+        separation (make-measurement 49 :ft)
+        next-bottom-magnitude (- (magnitude previous-top-us) (magnitude separation))
+        next-bottom (make-measurement next-bottom-magnitude stage-length-unit)
+        length (make-measurement 245 :ft)
+        next-top (make-measurement (- next-bottom-magnitude (magnitude length)) stage-length-unit)]
+    [next-top next-bottom]))
+
 (defn typical-stage-completion-time
   "Calculates the typical time in seconds for a stage to be completed."
   []
