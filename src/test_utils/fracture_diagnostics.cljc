@@ -852,3 +852,17 @@
                                        (repeat 12 :unconfirmed)
                                        (repeat 8 :new)))]
           [well stage status]))
+
+(def multi-picking-observation-classifications [:undefined
+                                                :ball-drop
+                                                :ball-seating
+                                                :break-down
+                                                :water-hammer-start
+                                                :diverter-drop
+                                                :proppant-ramp-start
+                                                :proppant-ramp-end
+                                                :rate-change
+                                                :spacer
+                                                :chemical
+                                                :proppant-ramp-end
+                                                :bad-data])
